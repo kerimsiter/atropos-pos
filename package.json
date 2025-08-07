@@ -1,0 +1,17 @@
+{
+  "name": "atropos-pos",
+  "private": true,
+  "scripts": {
+    "dev:desktop": "pnpm --filter atropos-desktop dev",
+    "dev:api": "pnpm --filter atropos-api start:dev"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "packageManager": "pnpm@9.1.0",
+  "pnpm": {
+    "workspaces": [
+      "packages/*"
+    ]
+  }
+}
