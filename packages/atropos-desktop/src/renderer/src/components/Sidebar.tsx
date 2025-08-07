@@ -5,6 +5,8 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import CategoryIcon from '@mui/icons-material/Category';
 import PercentIcon from '@mui/icons-material/Percent';
+import TableRestaurantIcon from '@mui/icons-material/TableRestaurant';
+import StorefrontIcon from '@mui/icons-material/Storefront';
 
 const drawerWidth = 240;
 
@@ -14,7 +16,9 @@ export const Sidebar = () => {
     { text: 'Ana Panel', icon: <DashboardIcon />, path: '/dashboard' },
     { text: 'Ürünler', icon: <InventoryIcon />, path: '/products' },
     { text: 'Kategoriler', icon: <CategoryIcon />, path: '/categories' },
-    { text: 'Vergiler', icon: <PercentIcon />, path: '/taxes' }, // Bu satırı ekle
+    { text: 'Vergiler', icon: <PercentIcon />, path: '/taxes' },
+    { text: 'Masa Yönetimi', icon: <TableRestaurantIcon />, path: '/tables' },
+    { text: 'Şubeler', icon: <StorefrontIcon />, path: '/branches' },
   ];
 
   return (

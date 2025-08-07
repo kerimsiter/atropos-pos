@@ -31,7 +31,8 @@ export class AuthService {
       username: user.username, 
       sub: user.id, 
       role: user.role,
-      companyId: user.companyId // <-- YENİ EKLENDİ
+      companyId: user.companyId,
+      branchId: user.branchId // <-- EKLENDİ
     };
     return {
       access_token: this.jwtService.sign(payload),

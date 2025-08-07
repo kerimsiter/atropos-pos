@@ -42,6 +42,7 @@ model Company {
   products          Product[]
   categories        Category[]
   taxes             Tax[]
+  tableAreas        TableArea[]
   paymentMethods    PaymentMethod[]
   onlinePlatforms   OnlinePlatform[]
   notificationTemplates NotificationTemplate[]
@@ -501,6 +502,7 @@ model RecipeItem {
 // ---------- 5. TABLE ----------
 model TableArea {
   id                String   @id @default(cuid())
+  companyId         String
   branchId          String
   name              String   // "Bahçe", "İç Mekan", "Teras" // [cite: 135]
   description       String? // [cite: 136]
@@ -512,9 +514,12 @@ model TableArea {
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
   deletedAt         DateTime? // [cite: 139]
+  
+  company           Company   @relation(fields: [companyId], references: [id])
   branch            Branch    @relation(fields: [branchId], references: [id]) // [cite: 140]
   tables            Table[]
 
+  @@index([companyId])
   @@index([branchId])
   @@index([deletedAt])
 }

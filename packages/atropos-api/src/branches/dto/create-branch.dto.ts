@@ -1,0 +1,20 @@
+import { IsString, IsNotEmpty } from 'class-validator';
+
+export class CreateBranchDto {
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  @IsString()
+  @IsNotEmpty()
+  code: string;
+
+  @IsString()
+  @IsNotEmpty()
+  address: string;
+
+  @IsString()
+  @IsNotEmpty()
+  phone: string;
+}
+

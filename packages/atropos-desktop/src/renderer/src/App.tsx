@@ -4,7 +4,9 @@ import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import ProductsPage from './pages/ProductsPage';
 import CategoriesPage from './pages/CategoriesPage';
-import TaxesPage from './pages/TaxesPage'; // Ekle
+import TaxesPage from './pages/TaxesPage';
+import TableManagementPage from './pages/TableManagementPage'; // Ekle
+import BranchesPage from './pages/BranchesPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { useAuthStore } from './store/authStore';
 import { MainLayout } from './layouts/MainLayout';
@@ -23,7 +25,9 @@ function App(): JSX.Element {
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/products" element={<ProductsPage />} />
             <Route path="/categories" element={<CategoriesPage />} />
-            <Route path="/taxes" element={<TaxesPage />} /> {/* Bu satırı ekle */}
+            <Route path="/taxes" element={<TaxesPage />} />
+            <Route path="/tables" element={<TableManagementPage />} /> {/* Bu satırı ekle */}
+            <Route path="/branches" element={<BranchesPage />} />
           </Route>
         </Route>
 

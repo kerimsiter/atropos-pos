@@ -9,9 +9,13 @@ const api = axios.create({
 // Axios Interceptor: Her istek gönderilmeden önce araya girer
 api.interceptors.request.use(
   (config) => {
-    const token = useAuthStore.getState().token; // Token'ı store'dan al
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    const authStorage = localStorage.getItem('auth-storage');
+    if (authStorage) {
+      const { state } = JSON.parse(authStorage);
+      const token = state.token;
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
     return config;
   },
