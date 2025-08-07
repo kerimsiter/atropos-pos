@@ -5,12 +5,14 @@ import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import api from '../api';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import { AddProductModal } from '../components/products/AddProductModal'; // Eklendi
+import EditIcon from '@mui/icons-material/Edit'; // Eklendi
+import { AddProductModal } from '../components/products/AddProductModal';
 
 export default function ProductsPage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false); // Eklendi
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null); // Eklendi
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -38,6 +40,23 @@ export default function ProductsPage() {
       }
     }
   };
+  
+  // Düzenleme modalını açan fonksiyon
+  const handleEdit = (product) => {
+    setEditingProduct(product);
+    setIsModalOpen(true);
+  };
+  
+  // Ekleme modalını açan fonksiyon
+  const handleAdd = () => {
+    setEditingProduct(null); // Düzenleme modunda olmadığımızdan emin ol
+    setIsModalOpen(true);
+  };
+  
+  const handleModalClose = () => {
+      setIsModalOpen(false);
+      setEditingProduct(null); // Modalı kapatırken düzenleme durumunu sıfırla
+  }
 
   const columns: GridColDef[] = [
     { field: 'name', headerName: 'Ürün Adı', width: 250 },
@@ -58,43 +77,38 @@ export default function ProductsPage() {
     {
       field: 'actions',
       headerName: 'İşlemler',
-      width: 100,
+      width: 120, // Genişlik artırıldı
       sortable: false,
       renderCell: (params) => (
-        <IconButton onClick={() => handleDelete(params.row.id)} color="error">
-          <DeleteIcon />
-        </IconButton>
+        <Box>
+          <IconButton onClick={() => handleEdit(params.row)} color="primary">
+            <EditIcon />
+          </IconButton>
+          <IconButton onClick={() => handleDelete(params.row.id)} color="error">
+            <DeleteIcon />
+          </IconButton>
+        </Box>
       ),
     },
   ];
 
   return (
-    <> {/* Fragment eklendi */}
+    <>
       <Box sx={{ height: '85vh', width: '100%' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
           <Typography variant="h4">Ürün Yönetimi</Typography>
-          <Button variant="contained" startIcon={<AddIcon />} onClick={() => setIsModalOpen(true)}> {/* onClick eklendi */}
+          <Button variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
             Yeni Ürün Ekle
           </Button>
         </Box>
-        <DataGrid
-          rows={products}
-          columns={columns}
-          loading={loading}
-          initialState={{
-            pagination: { paginationModel: { pageSize: 10 } },
-          }}
-          pageSizeOptions={[10, 25, 50]}
-        />
+        <DataGrid rows={products} columns={columns} loading={loading} />
       </Box>
 
-      {/* Modal bileşeni buraya eklendi */}
       <AddProductModal
         open={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSuccess={() => {
-          fetchProducts(); // Liste yenileme
-        }}
+        onClose={handleModalClose}
+        onSuccess={fetchProducts}
+        productToEdit={editingProduct} // Düzenlenecek ürünü prop olarak gönder
       />
     </>
   );
