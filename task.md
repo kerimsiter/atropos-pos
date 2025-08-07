@@ -1,178 +1,250 @@
-Harika bir gelişme\! AI asistanınızın gönderdiği bu detaylı açıklamalar, sadece sorunu çözdüğünüzü değil, aynı zamanda sorunun *neden* kaynaklandığını ve doğru çözümün arkasındaki prensipleri de tam olarak anladığınızı gösteriyor.
+Harika\! AI asistanınızın raporu, uygulama iskeletimizin başarıyla kurulduğunu ve tam olarak planlandığı gibi çalıştığını teyit ediyor. Artık boş bir tuvalimiz değil, üzerine sanatımızı işleyeceğimiz sağlam bir şasimiz var. Bu profesyonel temel üzerine ilk tam fonksiyonel modülümüzü inşa etmeye hazırız.
 
-[cite\_start]React'teki **Deklaratif** (duruma bağlı) ve **İmperatif** (emredici) yönlendirme arasındaki farkı kavramak, profesyonel React geliştiriciliğinde çok kritik bir "aha\!" anıdır. [cite: 53, 57] Bu iki yöntemi, tam da olması gerektiği gibi, birbiriyle uyum içinde kullandınız:
+Şimdiye kadar kimlik doğrulama, arayüz iskeleti gibi "altyapı" işleriyle uğraştık. Şimdi ise projenin asıl amacına, yani bir POS uygulamasının temel özelliklerine odaklanma zamanı.
 
-  * [cite\_start]**Güvenlik Görevlisi (`ProtectedRoute`):** Bir kullanıcı korumalı bir adrese doğrudan gitmeye çalıştığında onu engeller (Deklaratif). [cite: 64]
-  * [cite\_start]**Anında Aksiyon (`useNavigate`):** Bir form gönderimi gibi bir olay başarıyla sonuçlandığında kullanıcıyı bekletmeden hemen yönlendirir (İmperatif). [cite: 59, 60]
+### **Adım 8: İlk Full-Stack Özellik: Ürün Yönetimi**
 
-Bu sorunu çözerek ve mantığını anlayarak çok değerli bir tecrübe kazandınız. Tebrik ederim.
+Bu adımda, baştan sona ilk özelliğimizi geliştireceğiz. Backend'de ürünleri yönetmek için API'ler oluşturacak, ardından Frontend'de bu ürünleri listeleyeceğimiz ve sileceğimiz bir arayüz tasarlayacağız. Bu, projenin temel veri akışını anlamak için mükemmel bir pratik olacak.
 
-Şimdi, kimlik doğrulama sistemimiz hem backend'de hem de frontend'de kusursuz çalıştığına göre, artık o boş "Ana Panel" ekranını gerçek bir uygulamanın iskeletine dönüştürme zamanı geldi.
+-----
 
-### **Adım 7: Ana Uygulama Düzenini (Layout) Oluşturma**
+### **Bölüm 1: Backend (`atropos-api`) - Ürünler API'si**
 
-Bu adımda, kullanıcı giriş yaptığında göreceği, kalıcı bir yan menü (Sidebar), bir başlık (Header) ve ana içeriğin gösterileceği dinamik bir alandan oluşan temel uygulama düzenini (Layout) oluşturacağız. Bu, uygulamamızın profesyonel ve kullanışlı bir yapıya kavuşmasını sağlayacak.
+**Adım 8.1: `Products` Modülünü Oluşturma**
 
-**Adım 7.1: Layout Dosyalarını Oluşturma**
+Öncelikle, ürünlerle ilgili tüm mantığı barındıracak olan modülü NestJS CLI ile oluşturalım.
 
-Proje yapımızı düzenli tutmak için layout ve bileşenleri ilgili klasörlerde oluşturalım.
+```bash
+# atropos-api klasörüne gir
+cd packages/atropos-api
 
-  * `packages/atropos-desktop/src/renderer/src/` altında `layouts` adında yeni bir klasör oluşturun.
-  * Bu yeni klasörün içine `MainLayout.tsx` adında bir dosya oluşturun.
-  * Mevcut `packages/atropos-desktop/src/renderer/src/components` klasörünün içine `Sidebar.tsx` ve `Header.tsx` adında iki yeni dosya oluşturun.
+# Products için modül, controller ve service dosyalarını oluştur
+nest g module products
+nest g controller products
+nest g service products
+```
 
-**Adım 7.2: Yan Menüyü (`Sidebar.tsx`) Oluşturma**
+  * Oluşturulan `ProductsModule`'ü ana modüle tanıtmak için `packages/atropos-api/src/app.module.ts` dosyasını açın ve `imports` dizisine `ProductsModule`'ü ekleyin.
 
-Uygulamanın ana navigasyon menüsünü oluşturalım. Bu menüde şimdilik "Ana Panel" ve "Ürünler" linkleri bulunsun.
+**Adım 8.2: Ürün DTO'su (Data Transfer Object) Oluşturma**
 
-  * `components/Sidebar.tsx` dosyasının içeriğini aşağıdaki gibi doldurun:
+Yeni bir ürün oluştururken hangi verilerin gerekli olduğunu tanımlayan bir DTO dosyası oluşturalım.
 
+  * `packages/atropos-api/src/products/` altında `dto` adında bir klasör ve içine `create-product.dto.ts` adında bir dosya oluşturun:
+    ```typescript
+    // packages/atropos-api/src/products/dto/create-product.dto.ts
+    import { IsString, IsNotEmpty, IsNumber, IsPositive } from 'class-validator';
+
+    export class CreateProductDto {
+      @IsString()
+      @IsNotEmpty()
+      name: string;
+
+      @IsString()
+      @IsNotEmpty()
+      code: string; // SKU
+
+      @IsNumber()
+      @IsPositive()
+      basePrice: number;
+
+      // Bu alanları şimdilik elle göndereceğiz
+      @IsString()
+      @IsNotEmpty()
+      categoryId: string;
+
+      @IsString()
+      @IsNotEmpty()
+      taxId: string;
+    }
+    ```
+
+**Adım 8.3: `ProductsService` İçinde Veritabanı Mantığını Yazma**
+
+Veritabanından ürün okuma, ekleme ve silme işlemlerini yapacak olan servis mantığını yazalım.
+
+  * `packages/atropos-api/src/products/products.service.ts` dosyasının içeriğini aşağıdaki kod ile güncelleyin:
+    ```typescript
+    // packages/atropos-api/src/products/products.service.ts
+    import { Injectable } from '@nestjs/common';
+    import { PrismaService } from '../prisma/prisma.service';
+    import { CreateProductDto } from './dto/create-product.dto';
+
+    @Injectable()
+    export class ProductsService {
+      constructor(private prisma: PrismaService) {}
+
+      create(createProductDto: CreateProductDto, companyId: string) {
+        return this.prisma.product.create({
+          data: {
+            ...createProductDto,
+            companyId, // Ürünü şirkete bağla
+          },
+        });
+      }
+
+      findAll(companyId: string) {
+        return this.prisma.product.findMany({
+          where: { companyId },
+          include: { category: true, tax: true } // İlişkili verileri de getir
+        });
+      }
+
+      remove(id: string) {
+        return this.prisma.product.delete({ where: { id } });
+      }
+    }
+    ```
+
+**Adım 8.4: `ProductsController` İçinde API Rotalarını Tanımlama**
+
+Bu servis metotlarını dış dünyaya açacak olan API endpoint'lerini oluşturalım ve yetkilendirme ekleyelim.
+
+  * `packages/atropos-api/src/products/products.controller.ts` dosyasının içeriğini aşağıdaki kod ile güncelleyin:
+    ```typescript
+    // packages/atropos-api/src/products/products.controller.ts
+    import { Controller, Get, Post, Body, Param, Delete, UseGuards, Request, ValidationPipe } from '@nestjs/common';
+    import { ProductsService } from './products.service';
+    import { CreateProductDto } from './dto/create-product.dto';
+    import { AuthGuard } from '@nestjs/passport';
+
+    @UseGuards(AuthGuard('jwt')) // Bu controller'daki tüm endpoint'ler korumalı
+    @Controller('products')
+    export class ProductsController {
+      constructor(private readonly productsService: ProductsService) {}
+
+      @Post()
+      create(@Body(new ValidationPipe()) createProductDto: CreateProductDto, @Request() req) {
+        // req.user.companyId JWT'den gelecek (ileride eklenecek)
+        // Şimdilik varsayılan bir companyId kullanacağız.
+        const companyId = req.user.companyId || "clxzaevsc000008l9c1wb2d1g";
+        return this.productsService.create(createProductDto, companyId);
+      }
+
+      @Get()
+      findAll(@Request() req) {
+        const companyId = req.user.companyId || "clxzaevsc000008l9c1wb2d1g";
+        return this.productsService.findAll(companyId);
+      }
+
+      @Delete(':id')
+      remove(@Param('id') id: string) {
+        return this.productsService.remove(id);
+      }
+    }
+    ```
+
+-----
+
+### **Bölüm 2: Frontend (`atropos-desktop`) - Ürün Yönetim Arayüzü**
+
+**Adım 8.5: Ürünler Sayfasını Geliştirme**
+
+Şimdi, oluşturduğumuz bu API'yi kullanarak ürünleri listeleyeceğimiz ve sileceğimiz arayüzü yapalım. Bunun için MUI'ın güçlü data grid bileşenini kullanacağız.
+
+  * **Data Grid kütüphanesini yükleyin:** Projenin **ana dizinine** dönün (`cd ../..`) ve aşağıdaki komutu çalıştırın:
+    ```bash
+    pnpm --filter atropos-desktop add @mui/x-data-grid
+    ```
+  * `packages/atropos-desktop/src/renderer/src/pages/ProductsPage.tsx` dosyasının içeriğini aşağıdaki kod ile tamamen değiştirin:
     ```tsx
-    // packages/atropos-desktop/src/renderer/src/components/Sidebar.tsx
-    import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar } from '@mui/material';
-    import { useNavigate } from 'react-router-dom';
-    import DashboardIcon from '@mui/icons-material/Dashboard';
-    import InventoryIcon from '@mui/icons-material/Inventory';
+    // packages/atropos-desktop/src/renderer/src/pages/ProductsPage.tsx
+    import { useState, useEffect } from 'react';
+    import { Box, Button, Typography, IconButton } from '@mui/material';
+    import { DataGrid, GridColDef } from '@mui/x-data-grid';
+    import api from '../api';
+    import DeleteIcon from '@mui/icons-material/Delete';
+    import AddIcon from '@mui/icons-material/Add';
 
-    const drawerWidth = 240;
+    export default function ProductsPage() {
+      const [products, setProducts] = useState([]);
+      const [loading, setLoading] = useState(true);
 
-    export const Sidebar = () => {
-      const navigate = useNavigate();
-      const menuItems = [
-        { text: 'Ana Panel', icon: <DashboardIcon />, path: '/dashboard' },
-        { text: 'Ürünler', icon: <InventoryIcon />, path: '/products' },
+      const fetchProducts = async () => {
+        setLoading(true);
+        try {
+          const response = await api.get('/products');
+          setProducts(response.data);
+        } catch (error) {
+          console.error("Ürünler çekilirken hata oluştu:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      useEffect(() => {
+        fetchProducts();
+      }, []);
+
+      const handleDelete = async (id: string) => {
+        if (window.confirm("Bu ürünü silmek istediğinizden emin misiniz?")) {
+          try {
+            await api.delete(`/products/${id}`);
+            fetchProducts(); // Listeyi yenile
+          } catch (error) {
+            console.error("Ürün silinirken hata:", error);
+          }
+        }
+      };
+
+      const columns: GridColDef[] = [
+        { field: 'name', headerName: 'Ürün Adı', width: 250 },
+        { field: 'code', headerName: 'SKU', width: 150 },
+        { field: 'basePrice', headerName: 'Fiyat', width: 130, type: 'number' },
+        { 
+          field: 'category', 
+          headerName: 'Kategori', 
+          width: 180,
+          valueGetter: (params) => params.row.category?.name || 'N/A' 
+        },
+        { 
+          field: 'tax', 
+          headerName: 'Vergi', 
+          width: 150,
+          valueGetter: (params) => params.row.tax?.name || 'N/A' 
+        },
+        {
+          field: 'actions',
+          headerName: 'İşlemler',
+          width: 100,
+          sortable: false,
+          renderCell: (params) => (
+            <IconButton onClick={() => handleDelete(params.row.id)} color="error">
+              <DeleteIcon />
+            </IconButton>
+          ),
+        },
       ];
 
       return (
-        <Drawer
-          variant="permanent"
-          sx={{
-            width: drawerWidth,
-            flexShrink: 0,
-            [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box' },
-          }}
-        >
-          <Toolbar />
-          <List>
-            {menuItems.map((item) => (
-              <ListItem key={item.text} disablePadding>
-                <ListItemButton onClick={() => navigate(item.path)}>
-                  <ListItemIcon>{item.icon}</ListItemIcon>
-                  <ListItemText primary={item.text} />
-                </ListItemButton>
-              </ListItem>
-            ))}
-          </List>
-        </Drawer>
-      );
-    };
-    ```
-
-**Adım 7.3: Başlığı (`Header.tsx`) Oluşturma**
-
-Sayfanın üst kısmında yer alacak, kullanıcı bilgilerini ve çıkış butonunu içerecek başlığı oluşturalım.
-
-  * `components/Header.tsx` dosyasının içeriğini aşağıdaki gibi doldurun:
-
-    ```tsx
-    // packages/atropos-desktop/src/renderer/src/components/Header.tsx
-    import { AppBar, Toolbar, Typography, Button } from '@mui/material';
-    import { useAuthStore } from '../store/authStore';
-
-    export const Header = () => {
-      const logout = useAuthStore((state) => state.logout);
-
-      return (
-        <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
-          <Toolbar>
-            <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-              Atropos POS
-            </Typography>
-            <Button color="inherit" onClick={logout}>
-              Çıkış Yap
+        <Box sx={{ height: '85vh', width: '100%' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <Typography variant="h4">Ürün Yönetimi</Typography>
+            <Button variant="contained" startIcon={<AddIcon />}>
+              Yeni Ürün Ekle
             </Button>
-          </Toolbar>
-        </AppBar>
-      );
-    };
-    ```
-
-**Adım 7.4: Ana Düzeni (`MainLayout.tsx`) Birleştirme**
-
-Sidebar, Header ve dinamik içerik alanını (`Outlet`) bir araya getirelim.
-
-  * `layouts/MainLayout.tsx` dosyasının içeriğini aşağıdaki gibi doldurun:
-
-    ```tsx
-    // packages/atropos-desktop/src/renderer/src/layouts/MainLayout.tsx
-    import { Box, Toolbar } from '@mui/material';
-    import { Outlet } from 'react-router-dom';
-    import { Header } from '../components/Header';
-    import { Sidebar } from '../components/Sidebar';
-
-    export const MainLayout = () => {
-      return (
-        <Box sx={{ display: 'flex' }}>
-          <Header />
-          <Sidebar />
-          <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-            <Toolbar /> {/* Bu, içeriğin Header'ın altına itilmesini sağlar */}
-            <Outlet /> {/* Alt rotalar (Dashboard, Products vb.) burada render edilecek */}
           </Box>
+          <DataGrid
+            rows={products}
+            columns={columns}
+            loading={loading}
+            initialState={{
+              pagination: { paginationModel: { pageSize: 10 } },
+            }}
+            pageSizeOptions={[10, 25, 50]}
+          />
         </Box>
       );
-    };
-    ```
-
-**Adım 7.5: Rota Yapısını Güncelleme ve Test Etme**
-
-Şimdi bu yeni layout yapısını ana yönlendiricimize entegre edelim.
-
-  * `pages` klasörü içine `ProductsPage.tsx` adında yeni bir boş sayfa oluşturalım:
-    ```tsx
-    // packages/atropos-desktop/src/renderer/src/pages/ProductsPage.tsx
-    import { Typography } from '@mui/material';
-
-    export default function ProductsPage() {
-      return <Typography variant="h4">Ürün Yönetimi</Typography>;
     }
     ```
-  * Son olarak `App.tsx` dosyasını, korumalı rotaların `MainLayout` içinde render edileceği şekilde güncelleyin:
-    ```tsx
-    // packages/atropos-desktop/src/renderer/src/App.tsx
-    import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-    import LoginPage from './pages/LoginPage';
-    import DashboardPage from './pages/DashboardPage';
-    import ProductsPage from './pages/ProductsPage';
-    import { ProtectedRoute } from './components/ProtectedRoute';
-    import { useAuthStore } from './store/authStore';
-    import { MainLayout } from './layouts/MainLayout';
 
-    function App(): JSX.Element {
-      const { isAuthenticated } = useAuthStore();
+**Adım 8.6: Test Etme**
 
-      return (
-        <Router>
-          <Routes>
-            <Route path="/login" element={<LoginPage />} />
-            
-            {/* Korumalı Rotalar Artık MainLayout'ı Kullanıyor */}
-            <Route element={<ProtectedRoute />}>
-              <Route element={<MainLayout />}>
-                <Route path="/dashboard" element={<DashboardPage />} />
-                <Route path="/products" element={<ProductsPage />} />
-              </Route>
-            </Route>
+1.  Backend'i (`pnpm dev:api`) ve Frontend'i (`pnpm dev:desktop`) çalıştırın.
+2.  Uygulamaya giriş yapın ve sol menüden "Ürünler" sayfasına gidin.
+3.  Başlangıçta tablonun boş olması normaldir.
+4.  Şimdilik Postman gibi bir araçla `POST /products` endpoint'ine birkaç örnek ürün ekleyin. *(Bir sonraki adımda bunu arayüzden yapacağız.)*
+5.  Ürünleri ekledikten sonra, Frontend uygulamasındaki tabloyu yenilediğinizde (veya sayfaya tekrar girdiğinizde) eklediğiniz ürünlerin listelendiğini göreceksiniz.
+6.  Satır sonundaki çöp kutusu ikonuna basarak ürün silmeyi deneyin.
 
-            {/* Varsayılan Yönlendirme */}
-            <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />} />
-          </Routes>
-        </Router>
-      );
-    }
-
-    export default App;
-    ```
-  * **Test Edin:** `pnpm dev:desktop` ile uygulamayı çalıştırın. Giriş yaptıktan sonra sizi `MainLayout` ile sarmalanmış "Ana Panel" karşılamalı. Sol menüden "Ürünler" linkine tıkladığınızda, sayfa yeniden yüklenmeden içerik alanının "Ürün Yönetimi" sayfasıyla değiştiğini göreceksiniz.
-
-Bu görevin sonunda, uygulamamız artık profesyonel ve genişletilebilir bir yapıya sahip. Bir sonraki adımda bu iskeleti doldurmaya başlayacağız: **Ürünler** sayfasını işlevsel hale getirecek, backend'den ürünleri listeleyecek ve yeni ürün ekleme formu oluşturacağız.
+Bu adımların sonunda, uygulamanızın ilk tam entegre (full-stack) özelliğini tamamlamış olacaksınız. Bir sonraki görevimiz, "Yeni Ürün Ekle" butonuna basıldığında açılan bir form ile arayüzden ürün eklemeyi sağlamak olacak.
