@@ -7,6 +7,7 @@ import CategoriesPage from './pages/CategoriesPage';
 import TaxesPage from './pages/TaxesPage';
 import TableManagementPage from './pages/TableManagementPage'; // Ekle
 import BranchesPage from './pages/BranchesPage';
+import OrderPage from './pages/OrderPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { useAuthStore } from './store/authStore';
 import { MainLayout } from './layouts/MainLayout';
@@ -28,6 +29,7 @@ function App(): JSX.Element {
             <Route path="/taxes" element={<TaxesPage />} />
             <Route path="/tables" element={<TableManagementPage />} /> {/* Bu satırı ekle */}
             <Route path="/branches" element={<BranchesPage />} />
+            <Route path="/order/:tableId" element={<OrderPage />} />
           </Route>
         </Route>
 
