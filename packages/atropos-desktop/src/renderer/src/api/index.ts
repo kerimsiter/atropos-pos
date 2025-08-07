@@ -1,6 +1,5 @@
 // packages/atropos-desktop/src/renderer/src/api/index.ts
 import axios from 'axios';
-import { useAuthStore } from '../store/authStore';
 
 const api = axios.create({
   baseURL: 'http://localhost:3000', // Backend API adresimiz

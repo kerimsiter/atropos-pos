@@ -12,7 +12,7 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { useAuthStore } from './store/authStore';
 import { MainLayout } from './layouts/MainLayout';
 
-function App(): JSX.Element {
+function App() {
   const { isAuthenticated } = useAuthStore();
 
   return (

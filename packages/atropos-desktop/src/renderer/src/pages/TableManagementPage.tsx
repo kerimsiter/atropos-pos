@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Box, Typography, Button, Paper, Divider } from '@mui/material';
 import api from '../api';
 import { AddTableModal } from '../components/tables/AddTableModal';
+import { AddTableAreaModal } from '../components/table-areas/AddTableAreaModal';
 import { TableCard } from '../components/tables/TableCard';
 import { Table } from '../types/Table';
 import { TableArea } from '../types/TableArea';
@@ -10,6 +11,7 @@ const TableManagementPage = () => {
   const [tables, setTables] = useState<Table[]>([]);
   const [tableAreas, setTableAreas] = useState<TableArea[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAreaModalOpen, setIsAreaModalOpen] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -46,9 +48,14 @@ const TableManagementPage = () => {
         <Typography variant="h4" gutterBottom>
           Görsel Masa Yönetimi
         </Typography>
-        <Button variant="contained" onClick={() => setIsModalOpen(true)}>
-          Yeni Masa Ekle
-        </Button>
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <Button variant="outlined" onClick={() => setIsAreaModalOpen(true)}>
+            Yeni Alan Ekle
+          </Button>
+          <Button variant="contained" onClick={() => setIsModalOpen(true)}>
+            Yeni Masa Ekle
+          </Button>
+        </Box>
       </Box>
 
       {tableAreas.map((area) => (
@@ -72,6 +79,15 @@ const TableManagementPage = () => {
         onSuccess={() => {
           fetchData();
           setIsModalOpen(false);
+        }}
+      />
+
+      <AddTableAreaModal
+        open={isAreaModalOpen}
+        onClose={() => setIsAreaModalOpen(false)}
+        onSuccess={() => {
+          fetchData();
+          setIsAreaModalOpen(false);
         }}
       />
     </Box>

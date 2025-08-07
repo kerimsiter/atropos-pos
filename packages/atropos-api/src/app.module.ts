@@ -11,6 +11,7 @@ import { TableAreasModule } from './table-areas/table-areas.module';
 import { BranchesModule } from './branches/branches.module';
 import { UsersModule } from './users/users.module';
 import { TablesModule } from './tables/tables.module';
+import { OrdersModule } from './orders/orders.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { TablesModule } from './tables/tables.module';
     BranchesModule,
     UsersModule,
     TablesModule,
+    OrdersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

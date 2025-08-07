@@ -66,13 +66,13 @@ export default function ProductsPage() {
       field: 'category', 
       headerName: 'Kategori', 
       width: 180,
-      valueGetter: (value, row) => row.category?.name || 'N/A' 
+      valueGetter: (_value, row) => row.category?.name || 'N/A'
     },
     { 
       field: 'tax', 
       headerName: 'Vergi', 
       width: 150,
-      valueGetter: (value, row) => row.tax?.name || 'N/A' 
+      valueGetter: (_value, row) => row.tax?.name || 'N/A'
     },
     {
       field: 'actions',

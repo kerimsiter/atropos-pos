@@ -45,7 +45,7 @@ export default function CategoriesPage() {
       field: 'parent',
       headerName: 'Üst Kategori',
       width: 250,
-      valueGetter: (value, row) => row.parent?.name || '---',
+      valueGetter: (_value, row) => row.parent?.name || '---',
     },
     {
       field: 'actions',

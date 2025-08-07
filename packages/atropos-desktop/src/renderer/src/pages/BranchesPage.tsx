@@ -18,7 +18,7 @@ interface Branch {
 const BranchesPage = () => {
   const [branches, setBranches] = useState<Branch[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const adminUserId = useAuthStore((state) => state.profile?.userId); // EKLENDİ
+  const adminUserId = useAuthStore((state) => (state as any).profile?.userId); // profile tipinde userId yoksa güvenli erişim
 
   const fetchBranches = async () => {
     try {

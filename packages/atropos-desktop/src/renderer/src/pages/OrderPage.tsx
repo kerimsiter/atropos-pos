@@ -11,14 +11,37 @@ interface OrderItem extends Product {
 }
 
 export default function OrderPage() {
-  const { tableId } = useParams(); // URL'den masa ID'sini al
+  const { tableId } = useParams();
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
-  const [orderItems, setOrderItems] = useState<OrderItem[]>([]); // Adisyon listesi
+  const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
+
+  const loadActiveOrder = async () => {
+    if (!tableId) return;
+    try {
+      const { data } = await api.get(`/orders/active-by-table/${tableId}`);
+      if (data && Array.isArray(data.items)) {
+        const mapped: OrderItem[] = data.items.map((it: any) => {
+          const p = it.product ?? {};
+          return {
+            id: p.id ?? it.productId,
+            name: p.name ?? 'Ürün',
+            categoryId: p.categoryId ?? '',
+            basePrice: Number(it.unitPrice ?? p.basePrice ?? 0),
+            quantity: Number(it.quantity ?? 0),
+          } as OrderItem;
+        });
+        setOrderItems(mapped);
+      } else {
+        setOrderItems([]);
+      }
+    } catch (err) {
+      console.error('Aktif sipariş getirilirken hata:', err);
+    }
+  };
 
   useEffect(() => {
-    // Sayfa yüklendiğinde kategorileri ve ürünleri çek
     const fetchData = async () => {
       try {
         const [catRes, prodRes] = await Promise.all([
@@ -28,8 +51,10 @@ export default function OrderPage() {
         setCategories(catRes.data);
         setProducts(prodRes.data);
         if (catRes.data.length > 0) {
-          setSelectedCategory(catRes.data[0]); // İlk kategoriyi seçili yap
+          setSelectedCategory(catRes.data[0]);
         }
+        // mevcut aktif siparişi yükle
+        await loadActiveOrder();
       } catch (error) {
         console.error('Kategori veya ürünler getirilirken hata:', error);
       }
@@ -41,14 +66,38 @@ export default function OrderPage() {
     setOrderItems((prevItems) => {
       const itemExists = prevItems.find(item => item.id === product.id);
       if (itemExists) {
-        // Ürün zaten varsa miktarını artır
         return prevItems.map(item =>
           item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
         );
       }
-      // Ürün yoksa listeye ekle
       return [...prevItems, { ...product, quantity: 1 }];
     });
+  };
+
+  const handleSubmitOrder = async () => {
+    if (orderItems.length === 0 || !tableId) {
+      alert("Lütfen siparişe ürün ekleyin.");
+      return;
+    }
+
+    const payload = {
+      tableId: tableId,
+      items: orderItems.map((item) => ({
+        productId: item.id,
+        quantity: item.quantity,
+        unitPrice: Number(item.basePrice),
+      })),
+    };
+
+    try {
+      await api.post('/orders', payload);
+      alert(`Masa #${tableId} için sipariş başarıyla oluşturuldu!`);
+      // Navigasyon yerine aktif siparişi yeniden yükleyip ekranda göster
+      await loadActiveOrder();
+    } catch (error) {
+      console.error("Sipariş gönderilirken hata oluştu:", error);
+      alert("Sipariş oluşturulamadı!");
+    }
   };
   
   const filteredProducts = products.filter(p => p.categoryId === selectedCategory?.id);
@@ -57,7 +106,7 @@ export default function OrderPage() {
   return (
     <Grid container spacing={2}>
       {/* Sol Sütun: Menü */}
-      <Grid item xs={8}>
+      <Grid size={8}>
         <Paper sx={{ p: 1, mb: 2, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
           {categories.map((cat) => (
             <Button key={cat.id} variant={selectedCategory?.id === cat.id ? 'contained' : 'outlined'} onClick={() => setSelectedCategory(cat)}>
@@ -67,7 +116,7 @@ export default function OrderPage() {
         </Paper>
         <Grid container spacing={2}>
           {filteredProducts.map((prod) => (
-            <Grid item xs={4} sm={3} md={2} key={prod.id}>
+            <Grid size={{ xs: 4, sm: 3, md: 2 }} key={prod.id}>
               <Paper
                 onClick={() => handleAddProduct(prod)}
                 sx={{ p: 2, textAlign: 'center', cursor: 'pointer', height: '100px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
@@ -80,12 +129,12 @@ export default function OrderPage() {
       </Grid>
 
       {/* Sağ Sütun: Adisyon */}
-      <Grid item xs={4}>
+      <Grid size={4}>
         <Paper sx={{ p: 2, position: 'sticky', top: '80px' }}>
           <Typography variant="h5" gutterBottom>Masa #{tableId} Adisyon</Typography>
           <List sx={{ maxHeight: '60vh', overflow: 'auto' }}>
-            {orderItems.map((item) => (
-              <ListItem key={item.id}>
+            {orderItems.map((item, idx) => (
+              <ListItem key={`${item.id}-${idx}`}>
                 <ListItemText primary={`${item.name} x${item.quantity}`} secondary={`${(item.basePrice * item.quantity).toFixed(2)} TL`} />
               </ListItem>
             ))}
@@ -95,7 +144,13 @@ export default function OrderPage() {
             <Typography variant="h6">TOPLAM:</Typography>
             <Typography variant="h6">{total.toFixed(2)} TL</Typography>
           </Box>
-          <Button variant="contained" color="success" fullWidth sx={{ mt: 2 }}>
+          <Button 
+            variant="contained" 
+            color="success" 
+            fullWidth sx={{ mt: 2 }}
+            onClick={handleSubmitOrder}
+            disabled={orderItems.length === 0}
+          >
             Siparişi Gönder
           </Button>
         </Paper>
