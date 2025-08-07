@@ -3,6 +3,8 @@ import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Too
 import { useNavigate } from 'react-router-dom';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import InventoryIcon from '@mui/icons-material/Inventory';
+import CategoryIcon from '@mui/icons-material/Category';
+import PercentIcon from '@mui/icons-material/Percent';
 
 const drawerWidth = 240;
 
@@ -11,6 +13,8 @@ export const Sidebar = () => {
   const menuItems = [
     { text: 'Ana Panel', icon: <DashboardIcon />, path: '/dashboard' },
     { text: 'Ürünler', icon: <InventoryIcon />, path: '/products' },
+    { text: 'Kategoriler', icon: <CategoryIcon />, path: '/categories' },
+    { text: 'Vergiler', icon: <PercentIcon />, path: '/taxes' }, // Bu satırı ekle
   ];
 
   return (

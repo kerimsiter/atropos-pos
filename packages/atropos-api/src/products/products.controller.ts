@@ -11,15 +11,13 @@ export class ProductsController {
 
   @Post()
   create(@Body(new ValidationPipe()) createProductDto: CreateProductDto, @Request() req) {
-    // req.user.companyId JWT'den gelecek (ileride eklenecek)
-    // Şimdilik varsayılan bir companyId kullanacağız.
-    const companyId = req.user.companyId || "clxzaevsc000008l9c1wb2d1g";
+    const companyId = req.user.companyId; // Doğrudan JWT'den gelen companyId
     return this.productsService.create(createProductDto, companyId);
   }
 
   @Get()
   findAll(@Request() req) {
-    const companyId = req.user.companyId || "clxzaevsc000008l9c1wb2d1g";
+    const companyId = req.user.companyId; // Doğrudan JWT'den gelen companyId
     return this.productsService.findAll(companyId);
   }
 

@@ -27,7 +27,12 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('Kullanıcı adı veya parola hatalı.');
     }
-    const payload = { username: user.username, sub: user.id, role: user.role };
+    const payload = { 
+      username: user.username, 
+      sub: user.id, 
+      role: user.role,
+      companyId: user.companyId // <-- YENİ EKLENDİ
+    };
     return {
       access_token: this.jwtService.sign(payload),
     };

@@ -20,7 +20,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(payload: any) {
     // Token doğrulandıktan sonra request objesine bu veri eklenir (req.user)
-    return { userId: payload.sub, username: payload.username, role: payload.role };
+    return { 
+      userId: payload.sub, 
+      username: payload.username, 
+      role: payload.role,
+      companyId: payload.companyId // <-- YENİ EKLENDİ
+    };
   }
 }
 

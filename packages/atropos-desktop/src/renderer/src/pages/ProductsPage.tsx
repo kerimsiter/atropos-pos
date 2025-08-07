@@ -5,10 +5,12 @@ import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import api from '../api';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
+import { AddProductModal } from '../components/products/AddProductModal'; // Eklendi
 
 export default function ProductsPage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false); // Eklendi
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -67,22 +69,33 @@ export default function ProductsPage() {
   ];
 
   return (
-    <Box sx={{ height: '85vh', width: '100%' }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-        <Typography variant="h4">Ürün Yönetimi</Typography>
-        <Button variant="contained" startIcon={<AddIcon />}>
-          Yeni Ürün Ekle
-        </Button>
+    <> {/* Fragment eklendi */}
+      <Box sx={{ height: '85vh', width: '100%' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+          <Typography variant="h4">Ürün Yönetimi</Typography>
+          <Button variant="contained" startIcon={<AddIcon />} onClick={() => setIsModalOpen(true)}> {/* onClick eklendi */}
+            Yeni Ürün Ekle
+          </Button>
+        </Box>
+        <DataGrid
+          rows={products}
+          columns={columns}
+          loading={loading}
+          initialState={{
+            pagination: { paginationModel: { pageSize: 10 } },
+          }}
+          pageSizeOptions={[10, 25, 50]}
+        />
       </Box>
-      <DataGrid
-        rows={products}
-        columns={columns}
-        loading={loading}
-        initialState={{
-          pagination: { paginationModel: { pageSize: 10 } },
+
+      {/* Modal bileşeni buraya eklendi */}
+      <AddProductModal
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={() => {
+          fetchProducts(); // Liste yenileme
         }}
-        pageSizeOptions={[10, 25, 50]}
       />
-    </Box>
+    </>
   );
 }

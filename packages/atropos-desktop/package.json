@@ -26,12 +26,15 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@fontsource/space-grotesk": "^5.2.8",
+    "@hookform/resolvers": "^5.2.1",
     "@mui/icons-material": "^7.3.1",
     "@mui/material": "^7.3.1",
     "@mui/x-data-grid": "^8.9.2",
     "axios": "^1.11.0",
     "electron-updater": "^6.3.9",
+    "react-hook-form": "^7.62.0",
     "react-router-dom": "^7.7.1",
+    "yup": "^1.7.0",
     "zustand": "^5.0.7"
   },
   "devDependencies": {
