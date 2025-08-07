@@ -1,1 +1,0 @@
-﻿--- 1. Attempting to re-register 'admin' (expecting a 409 Conflict error)...\nReceived expected error: HTTP 409\nResponse Body: \n---\n--- 2. Logging in as 'admin'...\nLogin SUCCESSFUL. Access Token received.\n

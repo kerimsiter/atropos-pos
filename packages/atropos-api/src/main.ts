@@ -5,6 +5,11 @@ import { ValidationPipe } from '@nestjs/common'; // Bu satırı ekleyin
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // Geliştirme ortamında frontend'den gelen isteklere izin ver
+  app.enableCors({
+    origin: 'http://localhost:5173',
+  });
+
   app.useGlobalPipes(new ValidationPipe()); // Bu satırı ekleyin
 
   await app.listen(process.env.PORT ?? 3000);

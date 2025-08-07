@@ -1,27 +1,26 @@
 // packages/atropos-desktop/src/renderer/src/App.tsx
-
-import { Button, Stack, Typography } from '@mui/material';
-import SendIcon from '@mui/icons-material/Send';
+import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import LoginPage from './pages/LoginPage';
+import DashboardPage from './pages/DashboardPage';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import { useAuthStore } from './store/authStore';
 
 function App(): JSX.Element {
+  const { isAuthenticated } = useAuthStore();
+
   return (
-    <Stack spacing={2} sx={{ p: 4 }} alignItems="flex-start">
-      <Typography variant="h4">Atropos POS Arayüzü</Typography>
-      <Typography>Font ve Renk Testi</Typography>
-      
-      <Stack direction="row" spacing={2}>
-        <Button variant="contained">Birincil Buton</Button>
-        <Button variant="contained" color="secondary">
-          İkincil Buton
-        </Button>
-        <Button variant="contained" color="success" startIcon={<SendIcon />}>
-          Başarılı
-        </Button>
-        <Button variant="outlined" color="error">
-          Hata
-        </Button>
-      </Stack>
-    </Stack>
+    <Router>
+              <Routes>
+          <Route
+            path="/login"
+            element={isAuthenticated ? <Navigate to="/dashboard" /> : <LoginPage />}
+          />
+          <Route element={<ProtectedRoute />}>
+            <Route path="/dashboard" element={<DashboardPage />} />
+          </Route>
+          <Route path="*" element={<Navigate to="/dashboard" />} />
+        </Routes>
+    </Router>
   );
 }
 

@@ -1,207 +1,178 @@
-Harika, bu çok önemli bir kilometre taşı\! Backend'imiz artık veri kabul ediyor ve kaydediyor. Bu, projemizin kalbinin atmaya başladığı anlamına gelir. Bu sağlam temel üzerine şimdi kimlik doğrulama ve oturum yönetimi katmanını inşa edeceğiz.
+Harika bir gelişme\! AI asistanınızın gönderdiği bu detaylı açıklamalar, sadece sorunu çözdüğünüzü değil, aynı zamanda sorunun *neden* kaynaklandığını ve doğru çözümün arkasındaki prensipleri de tam olarak anladığınızı gösteriyor.
 
-Kullanıcı kaydı tamam olduğuna göre, şimdi sıra o kullanıcıyla sisteme giriş yapmaya ve bu girişi güvenli bir şekilde yönetmeye geldi. Bu adımda, modern web uygulamalarının standardı olan **JWT (JSON Web Token)** altyapısını kuracağız.
+[cite\_start]React'teki **Deklaratif** (duruma bağlı) ve **İmperatif** (emredici) yönlendirme arasındaki farkı kavramak, profesyonel React geliştiriciliğinde çok kritik bir "aha\!" anıdır. [cite: 53, 57] Bu iki yöntemi, tam da olması gerektiği gibi, birbiriyle uyum içinde kullandınız:
 
-Bu sistem sayesinde, kullanıcınız bir kere giriş yaptığında, ona özel, süreli ve güvenli bir "anahtar" (token) vereceğiz. Uygulama içindeki diğer tüm isteklerini bu anahtarla yapacak.
+  * [cite\_start]**Güvenlik Görevlisi (`ProtectedRoute`):** Bir kullanıcı korumalı bir adrese doğrudan gitmeye çalıştığında onu engeller (Deklaratif). [cite: 64]
+  * [cite\_start]**Anında Aksiyon (`useNavigate`):** Bir form gönderimi gibi bir olay başarıyla sonuçlandığında kullanıcıyı bekletmeden hemen yönlendirir (İmperatif). [cite: 59, 60]
 
-### **Adım 5: JWT ile Giriş (Login) ve Oturum Yönetimi**
+Bu sorunu çözerek ve mantığını anlayarak çok değerli bir tecrübe kazandınız. Tebrik ederim.
 
-Bu görev, kullanıcıların sisteme giriş yapmasını sağlayacak ve korumalı API'lere erişimlerini yönetecek altyapıyı oluşturmayı amaçlar.
+Şimdi, kimlik doğrulama sistemimiz hem backend'de hem de frontend'de kusursuz çalıştığına göre, artık o boş "Ana Panel" ekranını gerçek bir uygulamanın iskeletine dönüştürme zamanı geldi.
 
-**Adım 5.1: Gerekli JWT ve Passport Paketlerinin Kurulumu**
+### **Adım 7: Ana Uygulama Düzenini (Layout) Oluşturma**
 
-NestJS, kimlik doğrulama işlemleri için `Passport` kütüphanesiyle derin bir entegrasyon sunar. Bu entegrasyonu ve JWT'yi kullanmak için gerekli paketleri kuralım.
+Bu adımda, kullanıcı giriş yaptığında göreceği, kalıcı bir yan menü (Sidebar), bir başlık (Header) ve ana içeriğin gösterileceği dinamik bir alandan oluşan temel uygulama düzenini (Layout) oluşturacağız. Bu, uygulamamızın profesyonel ve kullanışlı bir yapıya kavuşmasını sağlayacak.
 
-  * Projenin **ana dizinindeyken** aşağıdaki komutu çalıştırın:
-    ```bash
-    pnpm --filter atropos-api add @nestjs/jwt @nestjs/passport passport passport-jwt
-    pnpm --filter atropos-api add -D @types/passport-jwt
+**Adım 7.1: Layout Dosyalarını Oluşturma**
+
+Proje yapımızı düzenli tutmak için layout ve bileşenleri ilgili klasörlerde oluşturalım.
+
+  * `packages/atropos-desktop/src/renderer/src/` altında `layouts` adında yeni bir klasör oluşturun.
+  * Bu yeni klasörün içine `MainLayout.tsx` adında bir dosya oluşturun.
+  * Mevcut `packages/atropos-desktop/src/renderer/src/components` klasörünün içine `Sidebar.tsx` ve `Header.tsx` adında iki yeni dosya oluşturun.
+
+**Adım 7.2: Yan Menüyü (`Sidebar.tsx`) Oluşturma**
+
+Uygulamanın ana navigasyon menüsünü oluşturalım. Bu menüde şimdilik "Ana Panel" ve "Ürünler" linkleri bulunsun.
+
+  * `components/Sidebar.tsx` dosyasının içeriğini aşağıdaki gibi doldurun:
+
+    ```tsx
+    // packages/atropos-desktop/src/renderer/src/components/Sidebar.tsx
+    import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar } from '@mui/material';
+    import { useNavigate } from 'react-router-dom';
+    import DashboardIcon from '@mui/icons-material/Dashboard';
+    import InventoryIcon from '@mui/icons-material/Inventory';
+
+    const drawerWidth = 240;
+
+    export const Sidebar = () => {
+      const navigate = useNavigate();
+      const menuItems = [
+        { text: 'Ana Panel', icon: <DashboardIcon />, path: '/dashboard' },
+        { text: 'Ürünler', icon: <InventoryIcon />, path: '/products' },
+      ];
+
+      return (
+        <Drawer
+          variant="permanent"
+          sx={{
+            width: drawerWidth,
+            flexShrink: 0,
+            [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box' },
+          }}
+        >
+          <Toolbar />
+          <List>
+            {menuItems.map((item) => (
+              <ListItem key={item.text} disablePadding>
+                <ListItemButton onClick={() => navigate(item.path)}>
+                  <ListItemIcon>{item.icon}</ListItemIcon>
+                  <ListItemText primary={item.text} />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+        </Drawer>
+      );
+    };
     ```
 
-**Adım 5.2: `.env` Dosyasına JWT Gizli Anahtarını Ekleme**
+**Adım 7.3: Başlığı (`Header.tsx`) Oluşturma**
 
-JWT'lerin güvenliği, sadece sunucunun bildiği gizli bir anahtar (secret) ile imzalanmalarına dayanır.
+Sayfanın üst kısmında yer alacak, kullanıcı bilgilerini ve çıkış butonunu içerecek başlığı oluşturalım.
 
-  * `packages/atropos-api/.env` dosyasını açın ve sonuna `JWT_SECRET` değişkenini ekleyin.
-    ```dotenv
-    # .env dosyasının sonuna ekleyin
-    JWT_SECRET=BU_COK_GIZLI_BIR_ANAHTARDIR_VE_HEMEN_DEGISTIRILMELIDIR_12345!
+  * `components/Header.tsx` dosyasının içeriğini aşağıdaki gibi doldurun:
+
+    ```tsx
+    // packages/atropos-desktop/src/renderer/src/components/Header.tsx
+    import { AppBar, Toolbar, Typography, Button } from '@mui/material';
+    import { useAuthStore } from '../store/authStore';
+
+    export const Header = () => {
+      const logout = useAuthStore((state) => state.logout);
+
+      return (
+        <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+          <Toolbar>
+            <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+              Atropos POS
+            </Typography>
+            <Button color="inherit" onClick={logout}>
+              Çıkış Yap
+            </Button>
+          </Toolbar>
+        </AppBar>
+      );
+    };
     ```
-    ***Önemli:** Buradaki değer sadece bir örnektir. Production ortamında buraya çok daha karmaşık ve tahmin edilemez bir anahtar koymalısınız.*
 
-**Adım 5.3: `AuthModule`'ü JWT için Yapılandırma**
+**Adım 7.4: Ana Düzeni (`MainLayout.tsx`) Birleştirme**
 
-`AuthModule`'ümüze JWT ve Passport modüllerini tanıtıp ayarlarını yapacağız.
+Sidebar, Header ve dinamik içerik alanını (`Outlet`) bir araya getirelim.
 
-  * Öncelikle, gelen isteklerdeki JWT'yi doğrulayacak olan "strateji" dosyamızı oluşturalım. `packages/atropos-api/src/auth` klasörü içinde `jwt.strategy.ts` adında yeni bir dosya oluşturun ve içeriğini doldurun:
-    ```typescript
-    // packages/atropos-api/src/auth/jwt.strategy.ts
-    import { Injectable } from '@nestjs/common';
-    import { PassportStrategy } from '@nestjs/passport';
-    import { ExtractJwt, Strategy } from 'passport-jwt';
-    import { ConfigService } from '@nestjs/config';
+  * `layouts/MainLayout.tsx` dosyasının içeriğini aşağıdaki gibi doldurun:
 
-    @Injectable()
-    export class JwtStrategy extends PassportStrategy(Strategy) {
-      constructor(private configService: ConfigService) {
-        super({
-          jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-          ignoreExpiration: false,
-          secretOrKey: configService.get<string>('JWT_SECRET'),
-        });
-      }
+    ```tsx
+    // packages/atropos-desktop/src/renderer/src/layouts/MainLayout.tsx
+    import { Box, Toolbar } from '@mui/material';
+    import { Outlet } from 'react-router-dom';
+    import { Header } from '../components/Header';
+    import { Sidebar } from '../components/Sidebar';
 
-      async validate(payload: any) {
-        // Token doğrulandıktan sonra request objesine bu veri eklenir (req.user)
-        return { userId: payload.sub, username: payload.username, role: payload.role };
-      }
+    export const MainLayout = () => {
+      return (
+        <Box sx={{ display: 'flex' }}>
+          <Header />
+          <Sidebar />
+          <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+            <Toolbar /> {/* Bu, içeriğin Header'ın altına itilmesini sağlar */}
+            <Outlet /> {/* Alt rotalar (Dashboard, Products vb.) burada render edilecek */}
+          </Box>
+        </Box>
+      );
+    };
+    ```
+
+**Adım 7.5: Rota Yapısını Güncelleme ve Test Etme**
+
+Şimdi bu yeni layout yapısını ana yönlendiricimize entegre edelim.
+
+  * `pages` klasörü içine `ProductsPage.tsx` adında yeni bir boş sayfa oluşturalım:
+    ```tsx
+    // packages/atropos-desktop/src/renderer/src/pages/ProductsPage.tsx
+    import { Typography } from '@mui/material';
+
+    export default function ProductsPage() {
+      return <Typography variant="h4">Ürün Yönetimi</Typography>;
     }
     ```
-  * Şimdi `packages/atropos-api/src/auth/auth.module.ts` dosyasını JWT modüllerini içerecek ve stratejimizi tanıtacak şekilde güncelleyin:
-    ```typescript
-    // packages/atropos-api/src/auth/auth.module.ts
-    import { Module } from '@nestjs/common';
-    import { AuthService } from './auth.service';
-    import { AuthController } from './auth.controller';
-    import { PrismaModule } from '../prisma/prisma.module';
-    import { PassportModule } from '@nestjs/passport';
-    import { JwtModule } from '@nestjs/jwt';
-    import { ConfigModule, ConfigService } from '@nestjs/config';
-    import { JwtStrategy } from './jwt.strategy';
+  * Son olarak `App.tsx` dosyasını, korumalı rotaların `MainLayout` içinde render edileceği şekilde güncelleyin:
+    ```tsx
+    // packages/atropos-desktop/src/renderer/src/App.tsx
+    import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+    import LoginPage from './pages/LoginPage';
+    import DashboardPage from './pages/DashboardPage';
+    import ProductsPage from './pages/ProductsPage';
+    import { ProtectedRoute } from './components/ProtectedRoute';
+    import { useAuthStore } from './store/authStore';
+    import { MainLayout } from './layouts/MainLayout';
 
-    @Module({
-      imports: [
-        PrismaModule,
-        PassportModule,
-        ConfigModule, // ConfigService'i kullanabilmek için
-        JwtModule.registerAsync({
-          imports: [ConfigModule],
-          useFactory: async (configService: ConfigService) => ({
-            secret: configService.get<string>('JWT_SECRET'),
-            signOptions: { expiresIn: '1d' }, // Token'lar 1 gün geçerli olacak
-          }),
-          inject: [ConfigService],
-        }),
-      ],
-      controllers: [AuthController],
-      providers: [AuthService, JwtStrategy], // JwtStrategy'yi provider olarak ekle
-    })
-    export class AuthModule {}
-    ```
+    function App(): JSX.Element {
+      const { isAuthenticated } = useAuthStore();
 
-**Adım 5.4: Login Mantığını ve Endpoint'ini Oluşturma**
+      return (
+        <Router>
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            
+            {/* Korumalı Rotalar Artık MainLayout'ı Kullanıyor */}
+            <Route element={<ProtectedRoute />}>
+              <Route element={<MainLayout />}>
+                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/products" element={<ProductsPage />} />
+              </Route>
+            </Route>
 
-Kullanıcı adı ve parolayı kontrol edip, doğruysa JWT üretecek mantığı yazalım.
-
-  * `packages/atropos-api/src/auth/dto` klasörüne `login.dto.ts` adında yeni bir DTO ekleyin:
-    ```typescript
-    // packages/atropos-api/src/auth/dto/login.dto.ts
-    import { IsString, IsNotEmpty } from 'class-validator';
-
-    export class LoginDto {
-      @IsString()
-      @IsNotEmpty()
-      username: string;
-
-      @IsString()
-      @IsNotEmpty()
-      password: string;
+            {/* Varsayılan Yönlendirme */}
+            <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />} />
+          </Routes>
+        </Router>
+      );
     }
+
+    export default App;
     ```
-  * `auth.service.ts` dosyasını `validateUser` ve `login` metotlarını içerecek şekilde güncelleyin:
-    ```typescript
-    // packages/atropos-api/src/auth/auth.service.ts (eklemeler yapılıyor)
-    import { Injectable, BadRequestException, UnauthorizedException } from '@nestjs/common';
-    import { PrismaService } from '../prisma/prisma.service';
-    import { RegisterUserDto } from './dto/register-user.dto';
-    import { LoginDto } from './dto/login.dto'; // Eklendi
-    import * as bcrypt from 'bcrypt';
-    import { JwtService } from '@nestjs/jwt'; // Eklendi
+  * **Test Edin:** `pnpm dev:desktop` ile uygulamayı çalıştırın. Giriş yaptıktan sonra sizi `MainLayout` ile sarmalanmış "Ana Panel" karşılamalı. Sol menüden "Ürünler" linkine tıkladığınızda, sayfa yeniden yüklenmeden içerik alanının "Ürün Yönetimi" sayfasıyla değiştiğini göreceksiniz.
 
-    @Injectable()
-    export class AuthService {
-      constructor(
-        private prisma: PrismaService,
-        private jwtService: JwtService, // Eklendi
-      ) {}
-
-      async validateUser(username: string, pass: string): Promise<any> {
-        const user = await this.prisma.user.findUnique({ where: { username } });
-        if (user && (await bcrypt.compare(pass, user.password))) {
-          const { password, ...result } = user;
-          return result;
-        }
-        return null;
-      }
-
-      async login(loginDto: LoginDto) {
-        const user = await this.validateUser(loginDto.username, loginDto.password);
-        if (!user) {
-          throw new UnauthorizedException('Kullanıcı adı veya parola hatalı.');
-        }
-        const payload = { username: user.username, sub: user.id, role: user.role };
-        return {
-          access_token: this.jwtService.sign(payload),
-        };
-      }
-      
-      // register metodu burada olduğu gibi kalacak...
-      async register(...) { ... }
-    }
-    ```
-  * `auth.controller.ts` dosyasına yeni `/login` endpoint'ini ve kimlik doğrulaması gerektiren örnek bir `/profile` endpoint'ini ekleyin:
-    ```typescript
-    // packages/atropos-api/src/auth/auth.controller.ts (eklemeler yapılıyor)
-    import { Controller, Post, Body, ValidationPipe, UseGuards, Get, Request } from '@nestjs/common';
-    import { AuthService } from './auth.service';
-    import { RegisterUserDto } from './dto/register-user.dto';
-    import { LoginDto } from './dto/login.dto'; // Eklendi
-    import { AuthGuard } from '@nestjs/passport'; // Eklendi
-
-    @Controller('auth')
-    export class AuthController {
-      constructor(private readonly authService: AuthService) {}
-
-      @Post('register')
-      register(@Body(new ValidationPipe()) registerUserDto: RegisterUserDto) {
-        return this.authService.register(registerUserDto);
-      }
-
-      @Post('login')
-      login(@Body(new ValidationPipe()) loginDto: LoginDto) {
-        return this.authService.login(loginDto);
-      }
-
-      // Bu endpoint'e sadece geçerli bir JWT ile erişilebilir.
-      @UseGuards(AuthGuard('jwt'))
-      @Get('profile')
-      getProfile(@Request() req) {
-        // req.user, JwtStrategy'deki validate metodundan döner.
-        return req.user;
-      }
-    }
-    ```
-
-**Adım 5.5: Test Etme**
-
-Tüm kimlik doğrulama akışını test edelim.
-
-1.  **Backend'i başlatın:** Ana dizindeyken `pnpm dev:api` komutunu çalıştırın.
-2.  **Giriş Yapın:** API istemcinizle (`Postman` vb.) bir `POST` isteği oluşturun.
-      * **URL:** `http://localhost:3000/auth/login`
-      * **Body (JSON):** Daha önce kaydettiğiniz kullanıcının bilgileri.
-        ```json
-        {
-          "username": "admin",
-          "password": "password123"
-        }
-        ```
-3.  **Token'ı Alın:** Cevap olarak gelen JSON içindeki `access_token` değerini kopyalayın.
-4.  **Korumalı Rotayı Test Edin:** Yeni bir `GET` isteği oluşturun.
-      * **URL:** `http://localhost:3000/auth/profile`
-      * **Authorization Ayarı:** İstemcinizin `Authorization` sekmesine gidin.
-          * **Type:** `Bearer Token` seçin.
-          * **Token:** Kopyaladığınız `access_token` değerini yapıştırın.
-5.  **İsteği Gönderin:** Cevap olarak, giriş yapmış kullanıcınızın `userId`, `username` ve `role` bilgilerini içeren bir JSON objesi görmelisiniz. Eğer token olmadan veya geçersiz bir token ile istek atarsanız `401 Unauthorized` hatası alırsınız.
-
-Tebrikler\! Artık uygulamanızın modern, güvenli ve standartlara uygun bir kimlik doğrulama altyapısı var. Bir sonraki adımda, bu altyapıyı kullanarak frontend tarafında giriş formu oluşturup, kullanıcı giriş yaptıktan sonra token'ı saklamayı ve korumalı API'lere istek atmayı ele alacağız.
+Bu görevin sonunda, uygulamamız artık profesyonel ve genişletilebilir bir yapıya sahip. Bir sonraki adımda bu iskeleti doldurmaya başlayacağız: **Ürünler** sayfasını işlevsel hale getirecek, backend'den ürünleri listeleyecek ve yeni ürün ekleme formu oluşturacağız.
