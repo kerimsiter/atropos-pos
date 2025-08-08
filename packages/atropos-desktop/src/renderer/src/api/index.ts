@@ -1,8 +1,17 @@
 // packages/atropos-desktop/src/renderer/src/api/index.ts
 import axios from 'axios';
 
+// Resolve API base URL from Vite env, fallback to localhost:3000 for dev
+const resolvedBaseURL = (import.meta as any)?.env?.VITE_API_URL || 'http://localhost:3000';
+// Log once to help diagnose environment mismatches
+if (typeof window !== 'undefined' && !(window as any).__API_BASE_LOGGED__) {
+  // eslint-disable-next-line no-console
+  console.info('[API] baseURL =', resolvedBaseURL);
+  (window as any).__API_BASE_LOGGED__ = true;
+}
+
 const api = axios.create({
-  baseURL: 'http://localhost:3000', // Backend API adresimiz
+  baseURL: resolvedBaseURL, // Backend API adresimiz
 });
 
 // Axios Interceptor: Her istek gönderilmeden önce araya girer

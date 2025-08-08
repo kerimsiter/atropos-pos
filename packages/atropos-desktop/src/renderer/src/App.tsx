@@ -3,6 +3,7 @@ import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import ProductsPage from './pages/ProductsPage';
+import InventoryPage from './pages/InventoryPage';
 import CategoriesPage from './pages/CategoriesPage';
 import TaxesPage from './pages/TaxesPage';
 import TableManagementPage from './pages/TableManagementPage'; // Ekle
@@ -26,6 +27,7 @@ function App() {
           <Route element={<MainLayout />}>
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/products" element={<ProductsPage />} />
+            <Route path="/inventory" element={<InventoryPage />} />
             <Route path="/categories" element={<CategoriesPage />} />
             <Route path="/taxes" element={<TaxesPage />} />
             <Route path="/tables" element={<TableManagementPage />} /> {/* Bu satırı ekle */}

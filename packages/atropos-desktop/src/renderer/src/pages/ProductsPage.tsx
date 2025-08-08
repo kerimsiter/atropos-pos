@@ -7,12 +7,16 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit'; // Eklendi
 import { AddProductModal } from '../components/products/AddProductModal';
+import MenuBookIcon from '@mui/icons-material/MenuBook';
+import { RecipeModal } from '../components/recipes/RecipeModal';
 
 export default function ProductsPage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null); // Eklendi
+  const [isRecipeOpen, setIsRecipeOpen] = useState(false);
+  const [recipeProduct, setRecipeProduct] = useState<any | null>(null);
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -77,7 +81,7 @@ export default function ProductsPage() {
     {
       field: 'actions',
       headerName: 'İşlemler',
-      width: 120, // Genişlik artırıldı
+      width: 170, // Reçete butonu eklendiği için artırıldı
       sortable: false,
       renderCell: (params) => (
         <Box>
@@ -86,6 +90,9 @@ export default function ProductsPage() {
           </IconButton>
           <IconButton onClick={() => handleDelete(params.row.id)} color="error">
             <DeleteIcon />
+          </IconButton>
+          <IconButton onClick={() => { setRecipeProduct(params.row); setIsRecipeOpen(true); }} color="secondary">
+            <MenuBookIcon />
           </IconButton>
         </Box>
       ),
@@ -109,6 +116,12 @@ export default function ProductsPage() {
         onClose={handleModalClose}
         onSuccess={fetchProducts}
         productToEdit={editingProduct} // Düzenlenecek ürünü prop olarak gönder
+      />
+
+      <RecipeModal
+        open={isRecipeOpen}
+        onClose={() => { setIsRecipeOpen(false); setRecipeProduct(null); }}
+        product={recipeProduct}
       />
     </>
   );

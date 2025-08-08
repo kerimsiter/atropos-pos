@@ -16,6 +16,7 @@ export const Sidebar = () => {
   const menuItems = [
     { text: 'Ana Panel', icon: <DashboardIcon />, path: '/dashboard' },
     { text: 'Ürünler', icon: <InventoryIcon />, path: '/products' },
+    { text: 'Envanter', icon: <InventoryIcon />, path: '/inventory' },
     { text: 'Kategoriler', icon: <CategoryIcon />, path: '/categories' },
     { text: 'Vergiler', icon: <PercentIcon />, path: '/taxes' },
     { text: 'Masa Yönetimi', icon: <TableRestaurantIcon />, path: '/tables' },

@@ -15,6 +15,8 @@ import { OrdersModule } from './orders/orders.module';
 import { PaymentMethodsModule } from './payment-methods/payment-methods.module';
 import { PaymentsModule } from './payments/payments.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { InventoryItemsModule } from './inventory-items/inventory-items.module';
+import { RecipesModule } from './recipes/recipes.module';
 // import { OrderItemsModule } from './order-items/order-items.module';
 
 @Module({
@@ -33,6 +35,8 @@ import { DashboardModule } from './dashboard/dashboard.module';
     PaymentMethodsModule,
     PaymentsModule,
     DashboardModule,
+    InventoryItemsModule,
+    RecipesModule,
     // OrderItemsModule, // disabled in favor of nested routes in OrdersModule
   ],
   controllers: [AppController],
