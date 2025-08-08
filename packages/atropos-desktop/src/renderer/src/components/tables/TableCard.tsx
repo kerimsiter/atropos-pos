@@ -1,7 +1,7 @@
 // packages/atropos-desktop/src/renderer/src/components/tables/TableCard.tsx
 import { useNavigate } from 'react-router-dom';
 import Draggable from 'react-draggable';
-import { Paper, Typography } from '@mui/material';
+import { Paper, Typography, Chip, Box } from '@mui/material';
 import { Table } from '../../types/Table';
 import React from 'react';
 
@@ -34,17 +34,42 @@ export const TableCard = ({ table, onStop }: TableCardProps) => {
           justifyContent: 'center',
           cursor: 'pointer', // 'move' yerine 'pointer' daha uygun
           position: 'absolute',
-          color: table.status === 'OCCUPIED' ? 'white' : 'inherit',
-          backgroundColor: table.status === 'OCCUPIED' ? 'primary.main' : 'background.paper',
+          color: (() => {
+            const os = table.orders?.[0]?.status?.toUpperCase();
+            if (os === 'READY') return 'white';
+            if (os === 'PREPARING') return 'white';
+            return table.status === 'OCCUPIED' ? 'white' : 'inherit';
+          })(),
+          backgroundColor: (() => {
+            const os = table.orders?.[0]?.status?.toUpperCase();
+            if (os === 'READY') return 'success.main';
+            if (os === 'PREPARING') return 'info.main';
+            return table.status === 'OCCUPIED' ? 'primary.main' : 'background.paper';
+          })(),
           '&:hover': {
-            backgroundColor: table.status === 'OCCUPIED' ? 'primary.dark' : 'grey.200',
+            backgroundColor: (() => {
+              const os = table.orders?.[0]?.status?.toUpperCase();
+              if (os === 'READY') return 'success.dark';
+              if (os === 'PREPARING') return 'info.dark';
+              return table.status === 'OCCUPIED' ? 'primary.dark' : 'grey.200';
+            })(),
           },
         }}
       >
+        <Box sx={{ position: 'absolute', top: 6 }}>
+          {table.orders?.[0]?.status && (
+            <Chip
+              size="small"
+              label={table.orders[0].status}
+              color={table.orders[0].status.toUpperCase() === 'READY' ? 'success' : table.orders[0].status.toUpperCase() === 'PREPARING' ? 'info' : 'default'}
+              sx={{ fontSize: 10 }}
+            />
+          )}
+        </Box>
         <Typography variant="h6">{table.number}</Typography>
         <Typography variant="caption">{table.capacity} Kişilik</Typography>
       </Paper>
     </Draggable>
   );
-};
+}
 

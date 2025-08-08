@@ -43,6 +43,16 @@ export default function KitchenPage() {
     const url = 'http://localhost:3000';
     // Use default transports (polling + upgrade) for broader compatibility
     const socket: Socket = io(url);
+    const refetch = () => {
+      api.get('/orders/kitchen')
+        .then((res) => {
+          const list = Array.isArray(res.data) ? res.data : [];
+          setOrders(() => list);
+        })
+        .catch(() => {});
+    };
+    socket.on('connect', refetch);
+    socket.on('reconnect', refetch);
 
     const onNewOrder = (order: OrderDTO) => {
       setOrders((prev) => {
@@ -56,7 +66,21 @@ export default function KitchenPage() {
       });
     };
     const onOrderStatusUpdated = (order: OrderDTO) => {
-      setOrders((prev) => prev.map((o) => (o.id === order.id ? order : o)));
+      const visible = ['CONFIRMED', 'PREPARING', 'READY', 'SERVING'];
+      // If order left KDS-visible states, remove it
+      if (!visible.includes(String(order.status).toUpperCase())) {
+        setOrders((prev) => prev.filter((o) => o.id !== order.id));
+        return;
+      }
+      setOrders((prev) => {
+        const idx = prev.findIndex((o) => o.id === order.id);
+        if (idx === -1) {
+          // out-of-sync: refetch once
+          refetch();
+          return prev;
+        }
+        return prev.map((o) => (o.id === order.id ? order : o));
+      });
     };
 
     socket.on('connect', () => {
@@ -68,6 +92,8 @@ export default function KitchenPage() {
     return () => {
       socket.off('new_order', onNewOrder);
       socket.off('order_status_updated', onOrderStatusUpdated);
+      socket.off('connect', refetch);
+      socket.off('reconnect', refetch);
       socket.disconnect();
     };
   }, []);

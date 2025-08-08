@@ -20,6 +20,15 @@ export class TablesService {
     return this.prisma.table.findMany({
       where: { branchId },
       orderBy: { number: 'asc' },
+      include: {
+        orders: {
+          where: {
+            status: { notIn: ['COMPLETED', 'CANCELLED'] },
+          },
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+        },
+      },
     });
   }
 

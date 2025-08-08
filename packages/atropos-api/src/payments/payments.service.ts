@@ -1,15 +1,16 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
+import { EventsGateway } from '../events/events.gateway';
 
 @Injectable()
 export class PaymentsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private eventsGateway: EventsGateway) {}
 
   async create(dto: CreatePaymentDto, userId: string, branchId: string) {
     const { orderId, paymentMethodId, amount } = dto;
 
-    return this.prisma.$transaction(async (tx) => {
+    const result = await this.prisma.$transaction(async (tx) => {
       const order = await tx.order.findUnique({ where: { id: orderId } });
       if (!order) throw new BadRequestException('Sipariş bulunamadı');
 
@@ -62,5 +63,12 @@ export class PaymentsService {
 
       return { payment, order: updatedOrder };
     });
+    try {
+      // Broadcast status update so KDS and waiter views refresh
+      this.eventsGateway.emitOrderStatusUpdated(result.order);
+    } catch (e) {
+      // swallow WS errors
+    }
+    return result;
   }
 }

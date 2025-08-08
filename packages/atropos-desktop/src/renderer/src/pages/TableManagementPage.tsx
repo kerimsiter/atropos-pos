@@ -6,6 +6,7 @@ import { AddTableAreaModal } from '../components/table-areas/AddTableAreaModal';
 import { TableCard } from '../components/tables/TableCard';
 import { Table } from '../types/Table';
 import { TableArea } from '../types/TableArea';
+import { io, Socket } from 'socket.io-client';
 
 const TableManagementPage = () => {
   const [tables, setTables] = useState<Table[]>([]);
@@ -28,6 +29,65 @@ const TableManagementPage = () => {
 
   useEffect(() => {
     fetchData();
+
+    // Real-time: listen order events to reflect on table cards
+    const socket: Socket = io('http://localhost:3000');
+    socket.on('connect', () => {
+      // Late connects get a fresh snapshot
+      fetchData();
+    });
+    socket.on('reconnect', () => {
+      fetchData();
+    });
+    const onNewOrder = (order: any) => {
+      // console.debug('[TM] new_order', order);
+      setTables((prev) => {
+        const idx = prev.findIndex((t) => t.id === order.tableId);
+        if (idx === -1) {
+          // Possibly out-of-sync list; refresh once
+          fetchData();
+          return prev;
+        }
+        const copy = [...prev];
+        const table = { ...copy[idx] } as Table;
+        const current = table.orders?.[0];
+        // merge/replace the latest active order
+        table.orders = [{ ...(current && current.id === order.id ? { ...current, ...order } : order) }];
+        // optionally mark occupied on confirmed
+        if (order.status && typeof order.status === 'string' && order.status.toUpperCase() === 'CONFIRMED') {
+          table.status = 'OCCUPIED';
+        }
+        copy[idx] = table;
+        return copy;
+      });
+    };
+    const onOrderStatusUpdated = (order: any) => {
+      // console.debug('[TM] order_status_updated', order);
+      setTables((prev) => {
+        const idx = prev.findIndex((t) => t.id === order.tableId);
+        if (idx === -1) {
+          fetchData();
+          return prev;
+        }
+        const copy = [...prev];
+        const table = { ...copy[idx] } as Table;
+        const current = table.orders?.[0];
+        if (current && current.id === order.id) {
+          table.orders = [{ ...current, ...order }];
+        } else {
+          table.orders = [{ ...(order || current) }];
+        }
+        copy[idx] = table;
+        return copy;
+      });
+    };
+    socket.on('new_order', onNewOrder);
+    socket.on('order_status_updated', onOrderStatusUpdated);
+    return () => {
+      socket.off('new_order', onNewOrder);
+      socket.off('order_status_updated', onOrderStatusUpdated);
+      socket.disconnect();
+    };
   }, []);
 
   const handleUpdatePosition = async (id: string, x: number, y: number) => {

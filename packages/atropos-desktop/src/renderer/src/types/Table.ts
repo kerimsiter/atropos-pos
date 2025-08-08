@@ -7,5 +7,12 @@ export interface Table {
   positionX?: number;
   positionY?: number;
   status: 'EMPTY' | 'OCCUPIED' | 'RESERVED' | 'CLEANING' | 'UNAVAILABLE' | 'MERGED';
+  // Latest active order (server returns orders: take:1)
+  orders?: Array<{
+    id: string;
+    status: string;
+    tableId?: string;
+    orderNumber?: string;
+  }>;
 }
 
