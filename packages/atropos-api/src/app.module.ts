@@ -12,6 +12,8 @@ import { BranchesModule } from './branches/branches.module';
 import { UsersModule } from './users/users.module';
 import { TablesModule } from './tables/tables.module';
 import { OrdersModule } from './orders/orders.module';
+import { PaymentMethodsModule } from './payment-methods/payment-methods.module';
+import { PaymentsModule } from './payments/payments.module';
 
 @Module({
   imports: [
@@ -26,6 +28,8 @@ import { OrdersModule } from './orders/orders.module';
     UsersModule,
     TablesModule,
     OrdersModule,
+    PaymentMethodsModule,
+    PaymentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

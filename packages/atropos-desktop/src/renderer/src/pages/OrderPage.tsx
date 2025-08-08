@@ -1,10 +1,11 @@
 // packages/atropos-desktop/src/renderer/src/pages/OrderPage.tsx
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Grid, Paper, Typography, Button, Box, List, ListItem, ListItemText, Divider } from '@mui/material';
 import api from '../api';
 import { Category } from '../types/Category';
 import { Product } from '../types/Product';
+import { PaymentModal } from '../components/payments/PaymentModal';
 
 interface OrderItem extends Product {
   quantity: number;
@@ -12,10 +13,13 @@ interface OrderItem extends Product {
 
 export default function OrderPage() {
   const { tableId } = useParams();
+  const navigate = useNavigate();
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
+  const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
+  const [paymentOpen, setPaymentOpen] = useState(false);
 
   const loadActiveOrder = async () => {
     if (!tableId) return;
@@ -33,8 +37,10 @@ export default function OrderPage() {
           } as OrderItem;
         });
         setOrderItems(mapped);
+        setActiveOrderId(data.id);
       } else {
         setOrderItems([]);
+        setActiveOrderId(null);
       }
     } catch (err) {
       console.error('Aktif sipariş getirilirken hata:', err);
@@ -153,8 +159,28 @@ export default function OrderPage() {
           >
             Siparişi Gönder
           </Button>
+          <Button 
+            variant="outlined" 
+            color="primary" 
+            fullWidth sx={{ mt: 1 }}
+            onClick={() => setPaymentOpen(true)}
+            disabled={!activeOrderId || orderItems.length === 0}
+          >
+            Ödeme Al
+          </Button>
         </Paper>
       </Grid>
+      <PaymentModal
+        open={paymentOpen}
+        onClose={() => setPaymentOpen(false)}
+        orderId={activeOrderId || ''}
+        totalAmount={total}
+        onSuccess={async () => {
+          // after payment, navigate back to tables
+          setPaymentOpen(false);
+          navigate('/tables');
+        }}
+      />
     </Grid>
   );
 }

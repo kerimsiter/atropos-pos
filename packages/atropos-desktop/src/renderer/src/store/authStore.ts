@@ -1,7 +1,7 @@
 // packages/atropos-desktop/src/renderer/src/store/authStore.ts
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import api from '../api';
+import axios from 'axios';
 
 interface UserState {
   token: string | null;
@@ -18,11 +18,12 @@ export const useAuthStore = create<UserState>()(
       profile: null,
       isAuthenticated: false,
       login: async (values) => {
-        const { data } = await api.post('/auth/login', values);
+        const { data } = await axios.post('http://localhost:3000/auth/login', values);
         // Token'ı state'e hemen kaydet, böylece sonraki istekler token'ı kullanabilir
         set({ token: data.access_token, isAuthenticated: true });
 
         // Token ile profil bilgisini çek
+        const { default: api } = await import('../api');
         const profileResponse = await api.get('/auth/profile');
         set({ profile: profileResponse.data });
       },

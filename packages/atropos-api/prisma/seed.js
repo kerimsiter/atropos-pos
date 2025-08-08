@@ -130,7 +130,33 @@ async function main() {
     // ignore if exists (unique on branchId+number)
   });
 
-  console.log('Seed completed:', { company: company.id, branch: branch?.id || null, admin: 'admin/admin', tax: tax.id, category: category?.id || null });
+  // 8) Payment Methods
+  const cash = await prisma.paymentMethod.upsert({
+    where: { companyId_code: { companyId: company.id, code: 'CASH' } },
+    update: { active: true, name: 'Nakit' },
+    create: {
+      companyId: company.id,
+      name: 'Nakit',
+      code: 'CASH',
+      type: 'CASH',
+      displayOrder: 1,
+      active: true,
+    },
+  });
+  const credit = await prisma.paymentMethod.upsert({
+    where: { companyId_code: { companyId: company.id, code: 'CC' } },
+    update: { active: true, name: 'Kredi Kartı' },
+    create: {
+      companyId: company.id,
+      name: 'Kredi Kartı',
+      code: 'CC',
+      type: 'CREDIT_CARD',
+      displayOrder: 2,
+      active: true,
+    },
+  });
+
+  console.log('Seed completed:', { company: company.id, branch: branch?.id || null, admin: 'admin/admin', tax: tax.id, category: category?.id || null, paymentMethods: [cash.code, credit.code] });
 }
 
 main()
