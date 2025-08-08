@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, MenuItem } from '@mui/material';
 import api from '../../api';
+import { toast } from 'react-hot-toast';
 
 interface PaymentMethod {
   id: string;
@@ -24,10 +25,15 @@ export const PaymentModal = ({ open, onClose, orderId, totalAmount, onSuccess }:
   useEffect(() => {
     if (open) {
       setAmount(String(totalAmount.toFixed(2)));
-      api.get('/payment-methods').then((res) => {
-        setMethods(res.data || []);
-        if (res.data?.length) setPaymentMethodId(res.data[0].id);
-      });
+      api.get('/payment-methods')
+        .then((res) => {
+          setMethods(res.data || []);
+          if (res.data?.length) setPaymentMethodId(res.data[0].id);
+        })
+        .catch((e) => {
+          console.error('Ödeme yöntemleri getirilemedi', e);
+          toast.error('Ödeme yöntemleri getirilemedi');
+        });
     }
   }, [open, totalAmount]);
 
@@ -36,9 +42,10 @@ export const PaymentModal = ({ open, onClose, orderId, totalAmount, onSuccess }:
       await api.post('/payments', { orderId, paymentMethodId, amount: String(amount) });
       onSuccess();
       onClose();
+      toast.success('Ödeme alındı');
     } catch (e) {
       console.error('Ödeme alınamadı', e);
-      alert('Ödeme alınamadı');
+      toast.error('Ödeme alınamadı');
     }
   };
 
