@@ -1,7 +1,8 @@
 // packages/atropos-desktop/src/renderer/src/pages/OrderPage.tsx
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Grid, Paper, Typography, Button, Box, List, ListItem, ListItemText, Divider } from '@mui/material';
+import { Grid, Paper, Typography, Button, Box, List, ListItem, ListItemText, Divider, IconButton } from '@mui/material';
+import { AddCircleOutline, RemoveCircleOutline, DeleteForever } from '@mui/icons-material';
 import api from '../api';
 import { Category } from '../types/Category';
 import { Product } from '../types/Product';
@@ -9,6 +10,7 @@ import { PaymentModal } from '../components/payments/PaymentModal';
 
 interface OrderItem extends Product {
   quantity: number;
+  orderItemId?: string; // server-side order item id for updates/deletes
 }
 
 export default function OrderPage() {
@@ -34,6 +36,7 @@ export default function OrderPage() {
             categoryId: p.categoryId ?? '',
             basePrice: Number(it.unitPrice ?? p.basePrice ?? 0),
             quantity: Number(it.quantity ?? 0),
+            orderItemId: it.id,
           } as OrderItem;
         });
         setOrderItems(mapped);
@@ -68,11 +71,68 @@ export default function OrderPage() {
     fetchData();
   }, []);
 
-  const handleAddProduct = (product: Product) => {
+  const handleRemoveItem = async (id: string) => {
+    try {
+      if (activeOrderId) {
+        await api.delete(`/orders/${activeOrderId}/items/${id}`);
+      } else {
+        // local mode: remove from local state
+        setOrderItems((prev) => prev.filter((it) => (it.orderItemId ?? it.id) !== id));
+        return;
+      }
+      await loadActiveOrder();
+    } catch (error: any) {
+      const msg = error?.response?.data?.message || error?.message || 'Bilinmeyen hata';
+      console.error('Ürün silinirken hata:', msg, error?.response?.data);
+    }
+  };
+
+  const handleUpdateQuantity = async (id: string, newQuantity: number) => {
+    if (newQuantity <= 0) {
+      await handleRemoveItem(id);
+      return;
+    }
+    try {
+      if (activeOrderId) {
+        await api.patch(`/orders/${activeOrderId}/items/${id}`, { quantity: newQuantity });
+      } else {
+        // local mode: update in place
+        setOrderItems((prev) => prev.map((it) => (it.orderItemId ?? it.id) === id ? { ...it, quantity: newQuantity } : it));
+        return;
+      }
+      await loadActiveOrder();
+    } catch (error: any) {
+      const msg = error?.response?.data?.message || error?.message || 'Bilinmeyen hata';
+      console.error('Miktar güncellenirken hata:', msg, error?.response?.data);
+    }
+  };
+
+  const handleAddProduct = async (product: Product) => {
+    // Always persist to server (implicit create/merge) when we know the tableId
+    if (tableId) {
+      try {
+        await api.post('/orders', {
+          tableId: tableId,
+          items: [
+            {
+              productId: product.id,
+              quantity: 1,
+              unitPrice: Number(product.basePrice),
+            },
+          ],
+        });
+        await loadActiveOrder();
+        return;
+      } catch (error) {
+        console.error('Ürün eklenirken (implicit create/merge) hata:', error);
+        // fallthrough to local as a graceful degradation
+      }
+    }
+    // Local fallback (should rarely happen if tableId is always present)
     setOrderItems((prevItems) => {
-      const itemExists = prevItems.find(item => item.id === product.id);
+      const itemExists = prevItems.find((item) => item.id === product.id);
       if (itemExists) {
-        return prevItems.map(item =>
+        return prevItems.map((item) =>
           item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
         );
       }
@@ -81,28 +141,18 @@ export default function OrderPage() {
   };
 
   const handleSubmitOrder = async () => {
-    if (orderItems.length === 0 || !tableId) {
-      alert("Lütfen siparişe ürün ekleyin.");
+    // New role: confirm/approve the existing active order so it goes to kitchen
+    if (!activeOrderId) {
+      alert('Henüz sipariş yok. Önce ürün ekleyin.');
       return;
     }
-
-    const payload = {
-      tableId: tableId,
-      items: orderItems.map((item) => ({
-        productId: item.id,
-        quantity: item.quantity,
-        unitPrice: Number(item.basePrice),
-      })),
-    };
-
     try {
-      await api.post('/orders', payload);
-      alert(`Masa #${tableId} için sipariş başarıyla oluşturuldu!`);
-      // Navigasyon yerine aktif siparişi yeniden yükleyip ekranda göster
+      await api.patch(`/orders/${activeOrderId}/confirm`);
       await loadActiveOrder();
+      alert('Sipariş onaylandı!');
     } catch (error) {
-      console.error("Sipariş gönderilirken hata oluştu:", error);
-      alert("Sipariş oluşturulamadı!");
+      console.error('Sipariş onaylanırken hata oluştu:', error);
+      alert('Sipariş onaylanamadı!');
     }
   };
   
@@ -140,8 +190,27 @@ export default function OrderPage() {
           <Typography variant="h5" gutterBottom>Masa #{tableId} Adisyon</Typography>
           <List sx={{ maxHeight: '60vh', overflow: 'auto' }}>
             {orderItems.map((item, idx) => (
-              <ListItem key={`${item.id}-${idx}`}>
-                <ListItemText primary={`${item.name} x${item.quantity}`} secondary={`${(item.basePrice * item.quantity).toFixed(2)} TL`} />
+              <ListItem
+                key={`${item.orderItemId ?? item.id}-${idx}`}
+                secondaryAction={
+                  <IconButton edge="end" aria-label="delete" onClick={() => item.orderItemId && handleRemoveItem(item.orderItemId)}>
+                    <DeleteForever color="error" />
+                  </IconButton>
+                }
+              >
+                <ListItemText
+                  primary={item.name}
+                  secondary={`${(item.basePrice * item.quantity).toFixed(2)} TL`}
+                />
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <IconButton size="small" onClick={() => handleUpdateQuantity((item.orderItemId ?? item.id), item.quantity - 1)}>
+                    <RemoveCircleOutline />
+                  </IconButton>
+                  <Typography variant="body1">{item.quantity}</Typography>
+                  <IconButton size="small" onClick={() => handleUpdateQuantity((item.orderItemId ?? item.id), item.quantity + 1)}>
+                    <AddCircleOutline />
+                  </IconButton>
+                </Box>
               </ListItem>
             ))}
           </List>
@@ -155,9 +224,9 @@ export default function OrderPage() {
             color="success" 
             fullWidth sx={{ mt: 2 }}
             onClick={handleSubmitOrder}
-            disabled={orderItems.length === 0}
+            disabled={!activeOrderId}
           >
-            Siparişi Gönder
+            Siparişi Onayla
           </Button>
           <Button 
             variant="outlined" 

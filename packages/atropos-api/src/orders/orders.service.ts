@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { OrderStatus, PaymentStatus } from '@prisma/client';
@@ -121,5 +121,100 @@ export class OrdersService {
         },
       },
     });
+  }
+
+  private async recomputeOrderTotals(tx: PrismaService['$transaction'] extends (cb: infer T) => any ? any : any, orderId: string) {
+    // fetch items for the order
+    const items = await tx.orderItem.findMany({ where: { orderId } });
+    const subtotal = items.reduce((sum: number, it: any) => sum + Number(it.unitPrice) * Number(it.quantity), 0);
+    const itemsTax = items.reduce((sum: number, it: any) => sum + Number(it.taxAmount ?? 0), 0);
+    // Order-level fields (kept simple; extend when discount/service charge logic is finalized)
+    const totalAmount = subtotal + itemsTax; 
+    await tx.order.update({ where: { id: orderId }, data: { subtotal, taxAmount: itemsTax, totalAmount } });
+  }
+
+  async updateItemQuantity(orderId: string, itemId: string, quantity: number, branchId: string) {
+    if (quantity <= 0) {
+      return this.removeItemFromOrder(orderId, itemId, branchId);
+    }
+    return this.prisma.$transaction(async (tx) => {
+      // authorize order belongs to branch
+      const order = await tx.order.findFirst({ where: { id: orderId, branchId, deletedAt: null } });
+      if (!order) {
+        console.warn('[updateItemQuantity] Order not found or unauthorized', { orderId, branchId });
+      }
+      if (!order) throw new NotFoundException('Order not found or unauthorized');
+
+      let item = await tx.orderItem.findFirst({ where: { id: itemId, orderId } });
+      if (!item) {
+        // Fallback: sometimes UI may send productId instead of orderItemId
+        item = await tx.orderItem.findFirst({ where: { productId: itemId, orderId } });
+      }
+      if (!item) {
+        const all = await tx.orderItem.findMany({ where: { orderId }, select: { id: true, productId: true, quantity: true } });
+        console.warn('[updateItemQuantity] Order item not found for order', { orderId, itemId, items: all });
+        throw new NotFoundException('Order item not found');
+      }
+
+      // update item totals (simple, no item-level discounts for now)
+      const unitPrice = Number(item.unitPrice);
+      const newTotal = unitPrice * quantity;
+      await tx.orderItem.update({
+        where: { id: item.id },
+        data: {
+          quantity,
+          totalAmount: newTotal,
+        },
+      });
+
+      await this.recomputeOrderTotals(tx, orderId);
+      return { ok: true };
+    });
+  }
+
+  async removeItemFromOrder(orderId: string, itemId: string, branchId: string) {
+    return this.prisma.$transaction(async (tx) => {
+      const order = await tx.order.findFirst({ where: { id: orderId, branchId, deletedAt: null } });
+      if (!order) {
+        console.warn('[removeItemFromOrder] Order not found or unauthorized', { orderId, branchId });
+      }
+      if (!order) throw new NotFoundException('Order not found or unauthorized');
+
+      let item = await tx.orderItem.findFirst({ where: { id: itemId, orderId } });
+      if (!item) {
+        // Fallback: sometimes UI may send productId instead of orderItemId
+        item = await tx.orderItem.findFirst({ where: { productId: itemId, orderId } });
+      }
+      if (!item) {
+        const all = await tx.orderItem.findMany({ where: { orderId }, select: { id: true, productId: true, quantity: true } });
+        console.warn('[removeItemFromOrder] Order item not found for order', { orderId, itemId, items: all });
+        throw new NotFoundException('Order item not found');
+      }
+
+      await tx.orderItem.delete({ where: { id: item.id } });
+      await this.recomputeOrderTotals(tx, orderId);
+      return { ok: true };
+    });
+  }
+
+  async confirm(orderId: string, branchId: string) {
+    const order = await this.prisma.order.findFirst({ where: { id: orderId, branchId, deletedAt: null } });
+    if (!order) {
+      console.warn('[confirm] Order not found or unauthorized', { orderId, branchId });
+    }
+    if (!order) throw new NotFoundException('Order not found or unauthorized');
+
+    // Optionally, validate it has at least one item
+    const itemsCount = await this.prisma.orderItem.count({ where: { orderId } });
+    if (itemsCount === 0) {
+      throw new NotFoundException('Order has no items to confirm');
+    }
+
+    const updated = await this.prisma.order.update({
+      where: { id: orderId },
+      data: { status: OrderStatus.CONFIRMED },
+      include: { items: true },
+    });
+    return updated;
   }
 }
