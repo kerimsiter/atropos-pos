@@ -20,6 +20,12 @@ export class OrdersController {
     return this.ordersService.findActiveByTable(tableId, branchId);
   }
 
+  @Get('kitchen')
+  listKitchen(@Request() req) {
+    const { branchId } = req.user;
+    return this.ordersService.listKitchenOrders(branchId);
+  }
+
   @Patch(':orderId/items/:itemId')
   updateItemQuantity(
     @Param('orderId') orderId: string,
@@ -37,6 +43,18 @@ export class OrdersController {
       throw new BadRequestException('Quantity cannot be negative');
     }
     return this.ordersService.updateItemQuantity(orderId, itemId, q, branchId);
+  }
+
+  @Patch(':orderId/status')
+  updateStatus(
+    @Param('orderId') orderId: string,
+    @Body('status') status: string,
+    @Request() req,
+  ) {
+    const { branchId } = req.user;
+    console.debug('[OrdersController.updateStatus] params', { orderId, status, branchId });
+    const s = String(status).toUpperCase();
+    return this.ordersService.updateStatus(orderId, s as any, branchId);
   }
 
   @Delete(':orderId/items/:itemId')

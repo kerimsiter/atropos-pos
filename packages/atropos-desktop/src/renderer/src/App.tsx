@@ -8,6 +8,7 @@ import TaxesPage from './pages/TaxesPage';
 import TableManagementPage from './pages/TableManagementPage'; // Ekle
 import BranchesPage from './pages/BranchesPage';
 import OrderPage from './pages/OrderPage';
+import KitchenPage from './pages/KitchenPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { useAuthStore } from './store/authStore';
 import { MainLayout } from './layouts/MainLayout';
@@ -30,6 +31,7 @@ function App() {
             <Route path="/tables" element={<TableManagementPage />} /> {/* Bu satırı ekle */}
             <Route path="/branches" element={<BranchesPage />} />
             <Route path="/order/:tableId" element={<OrderPage />} />
+            <Route path="/kitchen" element={<KitchenPage />} />
           </Route>
         </Route>
 

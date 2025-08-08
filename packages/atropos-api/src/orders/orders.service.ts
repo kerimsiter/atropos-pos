@@ -2,10 +2,11 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { OrderStatus, PaymentStatus } from '@prisma/client';
+import { EventsGateway } from '../events/events.gateway';
 
 @Injectable()
 export class OrdersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private eventsGateway: EventsGateway) {}
 
   async create(createOrderDto: CreateOrderDto, userId: string, branchId: string) {
     const { tableId, items } = createOrderDto;
@@ -99,6 +100,20 @@ export class OrdersService {
       await tx.table.update({ where: { id: tableId }, data: { status: 'OCCUPIED' } });
 
       return order;
+    });
+  }
+
+  async listKitchenOrders(branchId: string) {
+    return this.prisma.order.findMany({
+      where: {
+        branchId,
+        status: { in: ['CONFIRMED', 'PREPARING', 'READY', 'SERVING'] },
+        deletedAt: null,
+      },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        items: true,
+      },
     });
   }
 
@@ -215,6 +230,37 @@ export class OrdersService {
       data: { status: OrderStatus.CONFIRMED },
       include: { items: true },
     });
+    // Emit websocket event for kitchen display systems
+    try {
+      this.eventsGateway.emitNewOrder(updated);
+    } catch (e) {
+      // Avoid failing the HTTP flow due to WS errors; just log
+      console.warn('[confirm] Failed to emit new_order event', e);
+    }
+    return updated;
+  }
+
+  async updateStatus(orderId: string, status: OrderStatus, branchId: string) {
+    // Basic validation: allow only known forward-moving statuses
+    const allowed: OrderStatus[] = [
+      OrderStatus.CONFIRMED,
+      // allow preparing, ready, serving; do not include CANCELLED/PAID here
+      'PREPARING' as OrderStatus,
+      'READY' as OrderStatus,
+      'SERVING' as OrderStatus,
+    ];
+    if (!allowed.includes(status)) {
+      throw new NotFoundException('Unsupported status transition');
+    }
+    const order = await this.prisma.order.findFirst({ where: { id: orderId, branchId, deletedAt: null } });
+    if (!order) throw new NotFoundException('Order not found or unauthorized');
+
+    const updated = await this.prisma.order.update({ where: { id: orderId }, data: { status }, include: { items: true } });
+    try {
+      this.eventsGateway.emitOrderStatusUpdated(updated);
+    } catch (e) {
+      console.warn('[updateStatus] Failed to emit order_status_updated event', e);
+    }
     return updated;
   }
 }
