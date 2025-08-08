@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateInventoryItemDto } from './dto/create-inventory-item.dto';
 import { UpdateInventoryItemDto } from './dto/update-inventory-item.dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class InventoryItemsService {
@@ -64,5 +65,45 @@ export class InventoryItemsService {
       where: { id },
       data: { deletedAt: new Date(), active: false },
     });
+  }
+
+  // Deduct stock for all order items based on product recipes, within an existing transaction
+  async deductStockForOrder(orderId: string, tx: Prisma.TransactionClient) {
+    // 1) Load order items with product and its recipe (and items)
+    const orderItems = await tx.orderItem.findMany({
+      where: { orderId },
+      include: {
+        product: {
+          include: {
+            recipes: {
+              include: { items: true },
+            },
+          },
+        },
+      },
+    });
+
+    // 2) Iterate and deduct inventory for each recipe item
+    for (const item of orderItems) {
+      const recipe = item.product?.recipes?.[0];
+      if (!recipe) continue; // no recipe, nothing to deduct
+
+      for (const rItem of recipe.items) {
+        const totalDeduction = (Number(item.quantity) || 0) * Number(rItem.quantity);
+        if (!totalDeduction || totalDeduction <= 0) continue;
+
+        // 3) Decrement inventory stock; keep availableStock in sync if applicable
+        await tx.inventoryItem.update({
+          where: { id: rItem.inventoryItemId },
+          data: {
+            currentStock: { decrement: totalDeduction as unknown as any },
+            availableStock: { decrement: totalDeduction as unknown as any },
+          },
+        });
+
+        // 4) Optional: record stock movement (model not present in schema currently)
+        // TODO: Introduce StockMovement model to audit deductions
+      }
+    }
   }
 }

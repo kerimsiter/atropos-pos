@@ -2,10 +2,15 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { EventsGateway } from '../events/events.gateway';
+import { InventoryItemsService } from '../inventory-items/inventory-items.service';
 
 @Injectable()
 export class PaymentsService {
-  constructor(private prisma: PrismaService, private eventsGateway: EventsGateway) {}
+  constructor(
+    private prisma: PrismaService,
+    private eventsGateway: EventsGateway,
+    private inventoryService: InventoryItemsService,
+  ) {}
 
   async create(dto: CreatePaymentDto, userId: string, branchId: string) {
     const { orderId, paymentMethodId, amount } = dto;
@@ -60,6 +65,9 @@ export class PaymentsService {
           data: { status: 'EMPTY' },
         });
       }
+
+      // Deduct stock according to recipes for ordered products
+      await this.inventoryService.deductStockForOrder(order.id, tx);
 
       return { payment, order: updatedOrder };
     });
