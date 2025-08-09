@@ -68,7 +68,7 @@ export class InventoryItemsService {
   }
 
   // Deduct stock for all order items based on product recipes, within an existing transaction
-  async deductStockForOrder(orderId: string, tx: Prisma.TransactionClient) {
+  async deductStockForOrder(orderId: string, branchId: string, userId: string, tx: Prisma.TransactionClient) {
     // 1) Load order items with product and its recipe (and items)
     const orderItems = await tx.orderItem.findMany({
       where: { orderId },
@@ -92,8 +92,13 @@ export class InventoryItemsService {
         const totalDeduction = (Number(item.quantity) || 0) * Number(rItem.quantity);
         if (!totalDeduction || totalDeduction <= 0) continue;
 
-        // 3) Decrement inventory stock; keep availableStock in sync if applicable
-        await tx.inventoryItem.update({
+        // 3) Read inventory item to determine unit and previous stock
+        const inv = await tx.inventoryItem.findUnique({ where: { id: rItem.inventoryItemId } });
+        if (!inv) continue;
+        const prevStock = inv.currentStock as unknown as number;
+
+        // 4) Decrement inventory stock; keep availableStock in sync if applicable
+        const updated = await tx.inventoryItem.update({
           where: { id: rItem.inventoryItemId },
           data: {
             currentStock: { decrement: totalDeduction as unknown as any },
@@ -101,8 +106,23 @@ export class InventoryItemsService {
           },
         });
 
-        // 4) Optional: record stock movement (model not present in schema currently)
-        // TODO: Introduce StockMovement model to audit deductions
+        // 5) Record stock movement for auditing
+        await tx.stockMovement.create({
+          data: {
+            branchId,
+            productId: item.productId ?? item.product?.id ?? null,
+            inventoryItemId: rItem.inventoryItemId,
+            type: 'SALE',
+            reason: 'Product sale recipe consumption',
+            quantity: (-(totalDeduction) as unknown) as any, // negative for outflow
+            unit: inv.unit as any,
+            previousStock: (prevStock as unknown) as any,
+            currentStock: (updated.currentStock as unknown) as any,
+            referenceId: orderId,
+            referenceType: 'ORDER',
+            createdBy: userId,
+          },
+        });
       }
     }
   }

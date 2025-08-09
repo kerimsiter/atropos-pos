@@ -67,7 +67,12 @@ export class PaymentsService {
       }
 
       // Deduct stock according to recipes for ordered products
-      await this.inventoryService.deductStockForOrder(order.id, tx);
+      await this.inventoryService.deductStockForOrder(
+        order.id,
+        branchId || order.branchId,
+        userId,
+        tx,
+      );
 
       return { payment, order: updatedOrder };
     });
