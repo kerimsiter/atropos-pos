@@ -1,5 +1,6 @@
 // packages/atropos-desktop/src/renderer/src/components/Sidebar.tsx
-import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar } from '@mui/material';
+import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar, useMediaQuery } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import InventoryIcon from '@mui/icons-material/Inventory';
@@ -14,6 +15,8 @@ const drawerWidth = 240;
 
 export const Sidebar = () => {
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const menuItems = [
     { text: 'Ana Panel', icon: <DashboardIcon />, path: '/dashboard' },
     { text: 'Ürünler', icon: <InventoryIcon />, path: '/products' },
@@ -43,22 +46,24 @@ export const Sidebar = () => {
     width: `calc(${theme.spacing(7)} + 1px)`,
   });
 
-  const { isSidebarOpen } = useLayoutStore();
+  const { isSidebarOpen, toggleSidebar } = useLayoutStore();
 
   return (
     <Drawer
-      variant="permanent"
-      open={isSidebarOpen}
+      variant={isMobile ? 'temporary' : 'permanent'}
+      open={isMobile ? isSidebarOpen : true}
+      onClose={isMobile ? toggleSidebar : undefined}
+      ModalProps={{ keepMounted: true }}
       sx={(theme) => ({
         width: drawerWidth,
         flexShrink: 0,
         whiteSpace: 'nowrap',
         boxSizing: 'border-box',
-        ...(isSidebarOpen && {
+        ...(isSidebarOpen && !isMobile && {
           ...openedMixin(theme),
           '& .MuiDrawer-paper': openedMixin(theme),
         }),
-        ...(!isSidebarOpen && {
+        ...(!isSidebarOpen && !isMobile && {
           ...closedMixin(theme),
           '& .MuiDrawer-paper': closedMixin(theme),
         }),
@@ -70,12 +75,12 @@ export const Sidebar = () => {
           <ListItem key={item.text} disablePadding sx={{ display: 'block' }}>
             <ListItemButton
               onClick={() => navigate(item.path)}
-              sx={{ minHeight: 48, justifyContent: isSidebarOpen ? 'initial' : 'center', px: 2.5 }}
+              sx={{ minHeight: 48, justifyContent: isSidebarOpen || isMobile ? 'initial' : 'center', px: 2.5 }}
             >
-              <ListItemIcon sx={{ minWidth: 0, mr: isSidebarOpen ? 3 : 'auto', justifyContent: 'center' }}>
+              <ListItemIcon sx={{ minWidth: 0, mr: isSidebarOpen || isMobile ? 3 : 'auto', justifyContent: 'center' }}>
                 {item.icon}
               </ListItemIcon>
-              <ListItemText primary={item.text} sx={{ opacity: isSidebarOpen ? 1 : 0 }} />
+              <ListItemText primary={item.text} sx={{ opacity: isSidebarOpen || isMobile ? 1 : 0 }} />
             </ListItemButton>
           </ListItem>
         ))}

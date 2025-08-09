@@ -20,13 +20,13 @@ export const TableCard = ({ table }: TableCardProps) => {
   const isReady = orderStatus === 'READY';
 
   const cardStyles = {
-    width: 176,
-    height: 124,
+    width: '100%',
+    minHeight: { xs: 112, sm: 120 },
     display: 'flex',
     flexDirection: 'column' as const,
     alignItems: 'flex-start',
     justifyContent: 'space-between',
-    p: 1.5,
+    p: { xs: 1, sm: 1.5 },
     cursor: 'pointer',
     position: 'relative' as const,
     borderRadius: 2,
@@ -55,10 +55,10 @@ export const TableCard = ({ table }: TableCardProps) => {
   return (
     <Paper onClick={() => navigate(`/order/${table.id}`)} elevation={1} sx={cardStyles}>
       {/* Header Row: left = status, right = quick info icons */}
-      <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', minHeight: 20 }}>
           {currentOrder?.status && (
-            <Chip size="small" label={currentOrder.status} color={isReady ? 'success' : isOccupied ? 'error' : isReserved ? 'warning' : 'default'} sx={{ fontSize: 10, height: 22, borderRadius: 999 }} />
+            <Chip size="small" label={currentOrder.status} color={isReady ? 'success' : isOccupied ? 'error' : isReserved ? 'warning' : 'default'} sx={{ fontSize: { xs: 9, sm: 10 }, height: 22, borderRadius: 999 }} />
           )}
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
@@ -72,10 +72,12 @@ export const TableCard = ({ table }: TableCardProps) => {
         </Box>
       </Box>
 
-      <Typography variant="h6" sx={{ fontWeight: 700, mt: 0.5 }}>Masa {table.number}</Typography>
-      <Box>
-        <Typography variant="caption" display="block">{currentOrder?.waiter?.username || '---'}</Typography>
-        <Typography variant="body2" sx={{ fontWeight: 700 }}>{currentOrder ? `₺${Number(currentOrder.totalAmount || 0).toFixed(2)}` : 'Boş'}</Typography>
+      <Typography variant="subtitle1" sx={{ fontWeight: 700, mt: 0.5 }}>Masa {table.number}</Typography>
+      <Box sx={{ width: '100%', display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 1 }}>
+        <Typography variant="caption" display="block" sx={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {currentOrder?.waiter?.username || '---'}
+        </Typography>
+        <Typography variant="body2" sx={{ fontWeight: 700, flexShrink: 0 }}>{currentOrder ? `₺${Number(currentOrder.totalAmount || 0).toFixed(2)}` : 'Boş'}</Typography>
       </Box>
     </Paper>
   );
