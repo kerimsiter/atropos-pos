@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Box, Typography, Button, Paper, Divider, List, ListItem, ListItemText, Avatar } from '@mui/material';
+import { Box, Typography, Button, Paper, Divider, List, ListItem, ListItemText, Avatar, Grid } from '@mui/material';
 import api from '../api';
 import { AddTableModal } from '../components/tables/AddTableModal';
 import { AddTableAreaModal } from '../components/table-areas/AddTableAreaModal';
@@ -103,9 +103,10 @@ const TableManagementPage = () => {
   const totalAmount = activeOrders.reduce((sum, x) => sum + Number(x.order?.totalAmount || 0), 0);
 
   return (
-    <Box sx={{ display: 'flex', gap: 2 }}>
+    <Grid container spacing={2}>
       {/* Sol: Aktif Adisyonlar */}
-      <Paper elevation={0} sx={{ width: 300, p: 2, borderRadius: 2, display: 'flex', flexDirection: 'column' }}>
+      <Grid size={{ xs: 12, md: 3 }}>
+      <Paper elevation={0} sx={{ width: '100%', p: 2, borderRadius: 2, display: 'flex', flexDirection: 'column' }}>
         <Typography variant="subtitle2" sx={{ mb: 1, color: 'text.secondary' }}>Adisyonlar</Typography>
         <Divider sx={{ mb: 1 }} />
         <List dense sx={{ flex: 1, overflowY: 'auto' }}>
@@ -141,25 +142,29 @@ const TableManagementPage = () => {
           <Button variant="contained" onClick={() => setIsModalOpen(true)}>Yeni Masa</Button>
         </Box>
       </Paper>
+      </Grid>
 
       {/* Orta: Masa Grid */}
-      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1 }}>
+      <Grid size={{ xs: 12, md: 6 }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 0.5 }}>
           <Typography variant="overline" color="text.secondary">Katlar</Typography>
           <Typography variant="body2">›</Typography>
           <Typography variant="overline" color="text.primary">{occupiedOnly ? 'DOLU MASALAR' : (tableAreas.find(a => a.id === selectedAreaId)?.name || '—')}</Typography>
         </Box>
         <Paper elevation={0} sx={{ p: 2, borderRadius: 2 }}>
-          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(180px, 1fr))', gap: 1.5 }}>
+          <Box sx={{ display: 'grid', gap: 1.5, gridTemplateColumns: { xs: 'repeat(2, minmax(140px, 1fr))', sm: 'repeat(3, minmax(160px, 1fr))', md: 'repeat(4, minmax(180px, 1fr))', lg: 'repeat(5, minmax(200px, 1fr))' } }}>
             {visibleTables.map((table) => (
               <TableCard key={table.id} table={table} />
             ))}
           </Box>
         </Paper>
       </Box>
+      </Grid>
 
       {/* Sağ: Alan Seçici ve Hızlı Filtre */}
-      <Paper elevation={0} sx={{ width: 220, p: 2, borderRadius: 2 }}>
+      <Grid size={{ xs: 12, md: 3 }}>
+      <Paper elevation={0} sx={{ width: '100%', p: 2, borderRadius: 2 }}>
         <Typography variant="subtitle2" sx={{ mb: 1, color: 'text.secondary' }}>Alanlar</Typography>
         <Divider sx={{ mb: 1 }} />
         <Box sx={{ display: 'flex', mb: 1 }}>
@@ -196,6 +201,7 @@ const TableManagementPage = () => {
           })}
         </List>
       </Paper>
+      </Grid>
 
       {/* Modallar */}
       <AddTableModal
@@ -216,7 +222,7 @@ const TableManagementPage = () => {
           setIsAreaModalOpen(false);
         }}
       />
-    </Box>
+    </Grid>
   );
 };
 

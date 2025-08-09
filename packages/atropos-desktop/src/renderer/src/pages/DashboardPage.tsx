@@ -1,6 +1,6 @@
 // packages/atropos-desktop/src/renderer/src/pages/DashboardPage.tsx
 import { useState, useEffect } from 'react';
-import { Box, Typography, Paper, List, ListItem, ListItemText, CircularProgress, Alert } from '@mui/material';
+import { Box, Typography, Paper, List, ListItem, ListItemText, CircularProgress, Alert, Grid } from '@mui/material';
 import api from '../api';
 import { StatCard } from '../components/dashboard/StatCard';
 import PointOfSaleIcon from '@mui/icons-material/PointOfSale';
@@ -45,30 +45,29 @@ export default function DashboardPage() {
       </Typography>
       
       {/* Özet Kartları */}
-      <Box
-        sx={{
-          mb: 3,
-          display: 'grid',
-          gap: 3,
-          gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr' },
-        }}
-      >
-        <StatCard
-          title="Bugünkü Ciro"
-          value={`${Number(stats?.todaysRevenue || 0).toFixed(2)} TL`}
-          icon={<PointOfSaleIcon color="success" />}
-        />
-        <StatCard
-          title="Tamamlanan Sipariş"
-          value={stats?.todaysOrders || 0}
-          icon={<ReceiptLongIcon color="info" />}
-        />
-        <StatCard
-          title="Açık Masa"
-          value={stats?.openTables || 0}
-          icon={<TableRestaurantIcon color="warning" />}
-        />
-      </Box>
+      <Grid container spacing={3} sx={{ mb: 3 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+          <StatCard
+            title="Bugünkü Ciro"
+            value={`${Number(stats?.todaysRevenue || 0).toFixed(2)} TL`}
+            icon={<PointOfSaleIcon color="success" />}
+          />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+          <StatCard
+            title="Tamamlanan Sipariş"
+            value={stats?.todaysOrders || 0}
+            icon={<ReceiptLongIcon color="info" />}
+          />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+          <StatCard
+            title="Açık Masa"
+            value={stats?.openTables || 0}
+            icon={<TableRestaurantIcon color="warning" />}
+          />
+        </Grid>
+      </Grid>
 
       {/* En Çok Satan Ürünler */}
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
