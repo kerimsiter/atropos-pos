@@ -11,7 +11,7 @@ export const MainLayout = () => {
       <Toaster position="bottom-center" />
       <Header />
       <Sidebar />
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+      <Box component="main" sx={{ flexGrow: 1, p: 3, backgroundColor: (theme) => theme.palette.background.default }}>
         <Toolbar /> {/* Bu, içeriğin Header'ın altına itilmesini sağlar */}
         <Outlet /> {/* Alt rotalar (Dashboard, Products vb.) burada render edilecek */}
       </Box>

@@ -1,93 +1,77 @@
 // packages/atropos-desktop/src/renderer/src/theme.ts
-
 import { createTheme } from '@mui/material/styles';
 
-// Atropos Renk Paleti
+// Senin belirlediğin ana renkleri temel alan genişletilmiş palet
 const palette = {
   primary: {
     main: '#8B9373', // Ana Yeşil
+    light: '#C3C7B7',
+    dark: '#6F765C',
   },
   secondary: {
     main: '#F4A754', // Ana Turuncu
+    light: '#F9CE9F',
+    dark: '#C38543',
   },
-  error: {
-    main: '#FC6363', // Hata Rengi
-  },
-  warning: {
-    main: '#FFB546', // Uyarı Rengi
-  },
-  success: {
-    main: '#06C698', // Başarı Rengi
-  },
-  grey: {
-    '300': '#C3C7B7', // Gri Ton 1
-    '100': '#E4E6DE', // Gri Ton 2
-  },
+  error: { main: '#FC6363' },
+  warning: { main: '#FFB546' },
+  success: { main: '#06C698' },
   background: {
-    default: '#FAFAFA', // Ana Arkaplan (Aydınlık Tema)
-    paper: '#FFFFFF', // Kart, menü gibi bileşenlerin arkaplanı
-  },
-  text: {
-    primary: 'rgba(0, 0, 0, 0.87)',
-    secondary: 'rgba(0, 0, 0, 0.6)',
+    default: '#FAFAFA', // Sayfaların genel arkaplanı
+    paper: '#FFFFFF',   // Kartların ve panellerin arkaplanı
   },
 };
 
 export const theme = createTheme({
-  palette: palette,
+  palette: palette as any,
+  
+  // Yazı Tipi Hiyerarşisi
   typography: {
     fontFamily: '"Space Grotesk", sans-serif',
-    h4: {
-      fontWeight: 700,
-      letterSpacing: 0,
-    },
-    h6: {
-      fontWeight: 700,
-    },
-    body2: {
-      color: 'rgba(0, 0, 0, 0.6)',
-    },
+    h4: { fontWeight: 700 },
+    h5: { fontWeight: 600 },
+    h6: { fontWeight: 600 },
   },
-  shape: {
-    borderRadius: 12,
-  },
+
+  // Genel Bileşen Stilleri (Projenin kimliği burada şekilleniyor)
   components: {
-    // İleride buraya genel bileşen stillerini ekleyebiliriz.
-    // Örn: Butonların kenar yuvarlaklığını değiştirmek gibi.
+    // Butonlar
     MuiButton: {
       styleOverrides: {
         root: {
-          textTransform: 'none', // Buton yazılarını büyük harfe çevirme
           borderRadius: 8,
+          textTransform: 'none', // Buton yazıları büyük harf olmasın
+          fontWeight: 600,
         },
       },
     },
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          borderRadius: 12,
-          boxShadow: 'none',
-          border: '1px solid #EEEEEE', // Stroke
-        },
-      },
-    },
+    // Kartlar ve Paneller
     MuiPaper: {
       styleOverrides: {
         root: {
           borderRadius: 12,
-          boxShadow: 'none',
-          border: '1px solid #EEEEEE',
+          boxShadow: '0px 4px 12px rgba(0,0,0,0.05)',
         },
       },
     },
-    MuiListItem: {
+    // Yan Menü
+    MuiDrawer: {
+      styleOverrides: {
+        paper: {
+          backgroundColor: '#FFFFFF', // Yan menü arkaplanı
+          borderRight: 'none',
+        }
+      }
+    },
+    // Üst Başlık
+    MuiAppBar: {
       styleOverrides: {
         root: {
-          paddingTop: 8,
-          paddingBottom: 8,
-        },
-      },
-    },
+          backgroundColor: (palette as any).primary.main, // Başlık arkaplanı ana yeşil
+          boxShadow: 'none', // Daha modern ve düz bir görünüm için gölgeyi kaldır
+        }
+      }
+    }
   },
 });
 
