@@ -66,7 +66,11 @@ export const AddTableModal = ({ open, onClose, onSuccess, tableAreas }: AddTable
                 </Select>
               )}
             />
-            {errors.areaId && <p style={{ color: '#d32f2f', fontSize: '0.75rem', margin: '3px 14px 0' }}>{errors.areaId.message}</p>}
+            {errors.areaId && (
+              <Box component="p" sx={{ color: 'error.main', fontSize: '0.75rem', m: '3px 14px 0' }}>
+                {errors.areaId.message}
+              </Box>
+            )}
           </FormControl>
         </DialogContent>
         <DialogActions>
