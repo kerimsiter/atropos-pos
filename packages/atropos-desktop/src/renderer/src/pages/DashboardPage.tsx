@@ -39,8 +39,10 @@ export default function DashboardPage() {
   }
 
   return (
-    <Box>
-      <Typography variant="h4" gutterBottom>Ana Panel</Typography>
+    <Box sx={{ display: 'grid', gap: 3 }}>
+      <Typography variant="h4" gutterBottom sx={{ fontWeight: 700 }}>
+        Ana Panel
+      </Typography>
       
       {/* Özet Kartları */}
       <Box
@@ -70,7 +72,7 @@ export default function DashboardPage() {
 
       {/* En Çok Satan Ürünler */}
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
-        <Paper sx={{ p: 2 }}>
+        <Paper sx={{ p: 2.5 }}>
           <Typography variant="h6" gutterBottom>En Çok Satan Ürünler (Bugün)</Typography>
           <List>
             {stats?.topProducts?.length > 0 ? (

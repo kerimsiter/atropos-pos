@@ -11,14 +11,27 @@ interface StatCardProps {
 export const StatCard = ({ title, value, icon }: StatCardProps) => {
   return (
     <Card>
-      <CardContent>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-          {icon}
-          <Typography sx={{ ml: 1.5 }} variant="h6" component="div">
+      <CardContent sx={{ p: 2.5 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, mb: 1 }}>
+          <Box
+            sx={{
+              width: 40,
+              height: 40,
+              borderRadius: '10px',
+              backgroundColor: 'grey.100',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'primary.main',
+            }}
+          >
+            {icon}
+          </Box>
+          <Typography variant="h6" component="div" sx={{ fontSize: 16, fontWeight: 700 }}>
             {title}
           </Typography>
         </Box>
-        <Typography variant="h4" component="p" sx={{ textAlign: 'center' }}>
+        <Typography variant="h4" component="p" sx={{ textAlign: 'left', mt: 0.5 }}>
           {value}
         </Typography>
       </CardContent>

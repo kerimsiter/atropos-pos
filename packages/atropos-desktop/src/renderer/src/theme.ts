@@ -37,6 +37,19 @@ export const theme = createTheme({
   palette: palette,
   typography: {
     fontFamily: '"Space Grotesk", sans-serif',
+    h4: {
+      fontWeight: 700,
+      letterSpacing: 0,
+    },
+    h6: {
+      fontWeight: 700,
+    },
+    body2: {
+      color: 'rgba(0, 0, 0, 0.6)',
+    },
+  },
+  shape: {
+    borderRadius: 12,
   },
   components: {
     // İleride buraya genel bileşen stillerini ekleyebiliriz.
@@ -46,6 +59,32 @@ export const theme = createTheme({
         root: {
           textTransform: 'none', // Buton yazılarını büyük harfe çevirme
           borderRadius: 8,
+        },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          borderRadius: 12,
+          boxShadow: 'none',
+          border: '1px solid #EEEEEE', // Stroke
+        },
+      },
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          borderRadius: 12,
+          boxShadow: 'none',
+          border: '1px solid #EEEEEE',
+        },
+      },
+    },
+    MuiListItem: {
+      styleOverrides: {
+        root: {
+          paddingTop: 8,
+          paddingBottom: 8,
         },
       },
     },
