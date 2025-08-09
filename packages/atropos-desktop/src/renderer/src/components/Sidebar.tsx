@@ -8,6 +8,7 @@ import PercentIcon from '@mui/icons-material/Percent';
 import TableRestaurantIcon from '@mui/icons-material/TableRestaurant';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import KitchenIcon from '@mui/icons-material/Kitchen';
+import { useLayoutStore } from '../store/layoutStore';
 
 const drawerWidth = 240;
 
@@ -24,22 +25,57 @@ export const Sidebar = () => {
     { text: 'Mutfak', icon: <KitchenIcon />, path: '/kitchen' },
   ];
 
+  const openedMixin = (theme: any) => ({
+    width: drawerWidth,
+    transition: theme.transitions.create('width', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+    overflowX: 'hidden',
+  });
+
+  const closedMixin = (theme: any) => ({
+    transition: theme.transitions.create('width', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+    overflowX: 'hidden',
+    width: `calc(${theme.spacing(7)} + 1px)`,
+  });
+
+  const { isSidebarOpen } = useLayoutStore();
+
   return (
     <Drawer
       variant="permanent"
-      sx={{
+      open={isSidebarOpen}
+      sx={(theme) => ({
         width: drawerWidth,
         flexShrink: 0,
-        [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box' },
-      }}
+        whiteSpace: 'nowrap',
+        boxSizing: 'border-box',
+        ...(isSidebarOpen && {
+          ...openedMixin(theme),
+          '& .MuiDrawer-paper': openedMixin(theme),
+        }),
+        ...(!isSidebarOpen && {
+          ...closedMixin(theme),
+          '& .MuiDrawer-paper': closedMixin(theme),
+        }),
+      })}
     >
       <Toolbar />
       <List>
         {menuItems.map((item) => (
-          <ListItem key={item.text} disablePadding>
-            <ListItemButton onClick={() => navigate(item.path)}>
-              <ListItemIcon>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.text} />
+          <ListItem key={item.text} disablePadding sx={{ display: 'block' }}>
+            <ListItemButton
+              onClick={() => navigate(item.path)}
+              sx={{ minHeight: 48, justifyContent: isSidebarOpen ? 'initial' : 'center', px: 2.5 }}
+            >
+              <ListItemIcon sx={{ minWidth: 0, mr: isSidebarOpen ? 3 : 'auto', justifyContent: 'center' }}>
+                {item.icon}
+              </ListItemIcon>
+              <ListItemText primary={item.text} sx={{ opacity: isSidebarOpen ? 1 : 0 }} />
             </ListItemButton>
           </ListItem>
         ))}
