@@ -263,4 +263,22 @@ export class OrdersService {
     }
     return updated;
   }
+
+  async assignCustomer(orderId: string, customerId: string | null, branchId: string) {
+    // Verify order belongs to branch and is not deleted
+    const order = await this.prisma.order.findFirst({ where: { id: orderId, branchId, deletedAt: null } });
+    if (!order) throw new NotFoundException('Order not found or unauthorized');
+
+    // Optionally verify customer exists when provided
+    if (customerId) {
+      const customer = await this.prisma.customer.findUnique({ where: { id: customerId } });
+      if (!customer) throw new NotFoundException('Customer not found');
+    }
+
+    const updated = await this.prisma.order.update({
+      where: { id: orderId },
+      data: { customerId: customerId ?? null },
+    });
+    return updated;
+  }
 }

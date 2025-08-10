@@ -9,6 +9,7 @@ import PercentIcon from '@mui/icons-material/Percent';
 import TableRestaurantIcon from '@mui/icons-material/TableRestaurant';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import KitchenIcon from '@mui/icons-material/Kitchen';
+import PeopleIcon from '@mui/icons-material/People';
 import { useLayoutStore } from '../store/layoutStore';
 
 const drawerWidth = 240;
@@ -24,6 +25,7 @@ export const Sidebar = () => {
     { text: 'Kategoriler', icon: <CategoryIcon />, path: '/categories' },
     { text: 'Vergiler', icon: <PercentIcon />, path: '/taxes' },
     { text: 'Masa Yönetimi', icon: <TableRestaurantIcon />, path: '/tables' },
+    { text: 'Müşteriler', icon: <PeopleIcon />, path: '/customers' },
     { text: 'Şubeler', icon: <StorefrontIcon />, path: '/branches' },
     { text: 'Mutfak', icon: <KitchenIcon />, path: '/kitchen' },
   ];

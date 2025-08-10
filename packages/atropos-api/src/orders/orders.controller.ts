@@ -74,4 +74,17 @@ export class OrdersController {
     console.debug('[OrdersController.confirm] params', { orderId, branchId });
     return this.ordersService.confirm(orderId, branchId);
   }
+
+  @Patch(':orderId/customer')
+  assignCustomer(
+    @Param('orderId') orderId: string,
+    @Body('customerId') customerId: string | null,
+    @Request() req,
+  ) {
+    const { branchId } = req.user;
+    if (customerId !== null && typeof customerId !== 'string') {
+      throw new BadRequestException('customerId must be string or null');
+    }
+    return this.ordersService.assignCustomer(orderId, customerId, branchId);
+  }
 }

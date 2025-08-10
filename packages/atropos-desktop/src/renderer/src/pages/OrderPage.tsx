@@ -1,7 +1,7 @@
 // packages/atropos-desktop/src/renderer/src/pages/OrderPage.tsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Grid, Paper, Typography, Button, Box, List, ListItem, ListItemText, Divider, IconButton, Chip } from '@mui/material';
+import { Grid, Paper, Typography, Button, Box, List, ListItem, ListItemText, Divider, IconButton, Chip, Autocomplete, TextField } from '@mui/material';
 import { AddCircleOutline, RemoveCircleOutline, DeleteForever } from '@mui/icons-material';
 import api from '../api';
 import { Category } from '../types/Category';
@@ -24,7 +24,12 @@ export default function OrderPage() {
   const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [activeOrderStatus, setActiveOrderStatus] = useState<string | null>(null);
+  const [activeOrderCustomerId, setActiveOrderCustomerId] = useState<string | null>(null);
+  const [customers, setCustomers] = useState<Array<{ id: string; firstName?: string | null; lastName?: string | null; phone?: string | null }>>([]);
+  const [customerLoading, setCustomerLoading] = useState(false);
   const isConfirmed = activeOrderStatus === 'CONFIRMED';
+
+  const selectedCustomer = useMemo(() => customers.find(c => c.id === activeOrderCustomerId) || null, [customers, activeOrderCustomerId]);
 
   const loadActiveOrder = async () => {
     if (!tableId) return;
@@ -45,10 +50,12 @@ export default function OrderPage() {
         setOrderItems(mapped);
         setActiveOrderId(data.id);
         setActiveOrderStatus(data.status ?? null);
+        setActiveOrderCustomerId(data.customerId ?? null);
       } else {
         setOrderItems([]);
         setActiveOrderId(null);
         setActiveOrderStatus(null);
+        setActiveOrderCustomerId(null);
       }
     } catch (err) {
       console.error('Aktif sipariş getirilirken hata:', err);
@@ -70,12 +77,35 @@ export default function OrderPage() {
         }
         // mevcut aktif siparişi yükle
         await loadActiveOrder();
+        // müşterileri yükle (lightweight list for selection)
+        setCustomerLoading(true);
+        try {
+          const custRes = await api.get('/customers');
+          setCustomers(custRes.data || []);
+        } finally {
+          setCustomerLoading(false);
+        }
       } catch (error) {
         console.error('Kategori veya ürünler getirilirken hata:', error);
       }
     };
     fetchData();
   }, []);
+
+  const handleAssignCustomer = async (customerId: string | null) => {
+    if (!activeOrderId) {
+      toast.error('Aktif bir sipariş yok');
+      return;
+    }
+    try {
+      await api.patch(`/orders/${activeOrderId}/customer`, { customerId });
+      setActiveOrderCustomerId(customerId);
+      toast.success(customerId ? 'Müşteri atandı' : 'Müşteri kaldırıldı');
+    } catch (e) {
+      console.error('Müşteri atanırken hata:', e);
+      toast.error('Müşteri atanamadı');
+    }
+  };
 
   const handleRemoveItem = async (id: string) => {
     if (isConfirmed) {
@@ -218,6 +248,24 @@ export default function OrderPage() {
               />
             )}
           </Box>
+          <Box sx={{ mb: 2 }}>
+            <Autocomplete
+              size="small"
+              loading={customerLoading}
+              options={customers}
+              getOptionLabel={(opt) => `${opt.firstName ?? ''} ${opt.lastName ?? ''}`.trim() || (opt.phone ?? '') || '-'}
+              value={selectedCustomer}
+              onChange={(_e, val) => handleAssignCustomer(val?.id ?? null)}
+              renderInput={(params) => <TextField {...params} label="Müşteri Ata" placeholder="İsim/Telefon" />}
+              disabled={!activeOrderId || isConfirmed}
+              isOptionEqualToValue={(o, v) => o.id === v.id}
+            />
+            {selectedCustomer && (
+              <Button variant="text" color="warning" size="small" sx={{ mt: 0.5 }} onClick={() => handleAssignCustomer(null)} disabled={isConfirmed}>
+                Atamayı Kaldır
+              </Button>
+            )}
+          </Box>
           <List sx={{ maxHeight: '60vh', overflow: 'auto' }}>
             {orderItems.map((item, idx) => (
               <ListItem
@@ -274,6 +322,7 @@ export default function OrderPage() {
         onClose={() => setPaymentOpen(false)}
         orderId={activeOrderId || ''}
         totalAmount={total}
+        customerId={activeOrderCustomerId}
         onSuccess={async () => {
           // after payment, navigate back to tables
           setPaymentOpen(false);

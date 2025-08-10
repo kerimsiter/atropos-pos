@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumberString, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumberString, IsOptional, IsString } from 'class-validator';
 
 export class CreatePaymentDto {
   @IsString()
@@ -12,4 +12,9 @@ export class CreatePaymentDto {
   // Decimal as string to avoid JS float issues
   @IsNumberString()
   amount: string;
+
+  // Optional: loyalty points to spend (integer as string)
+  @IsOptional()
+  @IsNumberString()
+  pointsToSpend?: string;
 }

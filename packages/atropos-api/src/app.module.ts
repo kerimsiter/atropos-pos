@@ -18,6 +18,8 @@ import { DashboardModule } from './dashboard/dashboard.module';
 import { InventoryItemsModule } from './inventory-items/inventory-items.module';
 import { RecipesModule } from './recipes/recipes.module';
 // import { OrderItemsModule } from './order-items/order-items.module';
+import { CustomersModule } from './customers/customers.module';
+import { LoyaltyModule } from './loyalty/loyalty.module';
 
 @Module({
   imports: [
@@ -37,6 +39,8 @@ import { RecipesModule } from './recipes/recipes.module';
     DashboardModule,
     InventoryItemsModule,
     RecipesModule,
+    CustomersModule,
+    LoyaltyModule,
     // OrderItemsModule, // disabled in favor of nested routes in OrdersModule
   ],
   controllers: [AppController],
