@@ -2,6 +2,7 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import os from 'os' // Node.js'in 'os' modülünü içe aktar
 
 function createWindow(): void {
   // Create the browser window.
@@ -49,10 +50,9 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // YENİ: Frontend'den gelen bir isteğe yanıt veren IPC handler'ı.
-  // Bir isim alıp selamlama mesajı döndürecek.
-  ipcMain.handle('get:greeting', (_event, name) => {
-    return `Merhaba ${name}, bu mesaj ana süreçten (backend) geldi!`
+  // YENİ HALİ: Sadece ana sürecin erişebileceği bir bilgiyi döndürelim.
+  ipcMain.handle('get:os-info', () => {
+    return `Bu mesaj backend'den geldi. İşletim sisteminiz: ${os.platform()}`
   })
 
   createWindow()

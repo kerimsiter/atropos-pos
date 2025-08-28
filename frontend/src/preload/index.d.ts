@@ -1,7 +1,7 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
 
 interface CustomAPI {
-  getGreeting: (name: string) => Promise<string>
+  getOsInfo: () => Promise<string>
 }
 
 declare global {

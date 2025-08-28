@@ -3,7 +3,7 @@ import { electronAPI } from '@electron-toolkit/preload'
 
 // Renderer tarafında kullanılacak özel API'ler
 const api = {
-  getGreeting: (name: string): Promise<string> => ipcRenderer.invoke('get:greeting', name)
+  getOsInfo: (): Promise<string> => ipcRenderer.invoke('get:os-info')
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to
