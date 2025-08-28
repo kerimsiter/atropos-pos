@@ -60,3 +60,4 @@ backend/app/generated/
 frontend/package-lock.json
 backend/package-lock.json
 frontend/out/renderer/assets/
+/generated/prisma
