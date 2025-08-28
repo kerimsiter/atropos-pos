@@ -61,3 +61,5 @@ frontend/package-lock.json
 backend/package-lock.json
 frontend/out/renderer/assets/
 /generated/prisma
+/prisma/migrations
+/prisma/migrations/20250828061242_init/migration.sql

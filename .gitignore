@@ -67,3 +67,4 @@ frontend/package-lock.json
 backend/package-lock.json
 frontend/out/renderer/assets/
 package-lock.json
+backend/prisma/migrations
