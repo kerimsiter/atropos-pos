@@ -1,14 +1,20 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { ValidationPipe } from '@nestjs/common'; // YENİ: ValidationPipe import edildi
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // CORS'u etkinleştirin. Bu, diğer kaynaklardan gelen isteklere izin verir.
-  // Geliştirme aşamasında bu şekilde bırakmak genellikle yeterlidir.
-  // Prodüksiyonda belirli origin'lere izin vermek daha güvenlidir.
-  // Örn: app.enableCors({ origin: 'http://allowed-domain.com' });
   app.enableCors();
+
+  // YENİ: Global Validation Pipe eklendi
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true, // DTO'da olmayan verileri otomatik olarak kaldırır
+      forbidNonWhitelisted: true, // DTO'da olmayan bir veri gelirse hata fırlatır
+      transform: true, // Gelen veriyi DTO tipine dönüştürmeye çalışır
+    }),
+  );
 
   await app.listen(process.env.PORT ?? 3000);
 }
