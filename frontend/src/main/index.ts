@@ -49,8 +49,11 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
+  // YENİ: Frontend'den gelen bir isteğe yanıt veren IPC handler'ı.
+  // Bir isim alıp selamlama mesajı döndürecek.
+  ipcMain.handle('get:greeting', (_event, name) => {
+    return `Merhaba ${name}, bu mesaj ana süreçten (backend) geldi!`
+  })
 
   createWindow()
 

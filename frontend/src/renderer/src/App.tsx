@@ -1,41 +1,42 @@
-import { Button, Stack } from '@mantine/core'
-import Versions from './components/Versions'
-import electronLogo from './assets/electron.svg'
+import { useState } from 'react'
+import { Container, Title, Stack, TextInput, Button, Text } from '@mantine/core'
 
 function App(): React.JSX.Element {
-  const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
+  const [name, setName] = useState('')
+  const [greeting, setGreeting] = useState('')
+
+  const handleButtonClick = async (): Promise<void> => {
+    if (name) {
+      const response = await window.api.getGreeting(name)
+      setGreeting(response)
+    }
+  }
 
   return (
-    <>
-      <img alt="logo" className="logo" src={electronLogo} />
-      <div className="creator">Powered by electron-vite</div>
-      <div className="text">
-        Build an Electron app with <span className="react">React</span>
-        &nbsp;and <span className="ts">TypeScript</span>
-      </div>
-      <p className="tip">
-        Please try pressing <code>F12</code> to open the devTool
-      </p>
+    <Container>
+      <Stack align="center">
+        <Title order={1}>Restoran POS Sistemi</Title>
+        <Text c="dimmed">Backend ile İletişim Testi</Text>
 
-      {/* Mevcut actions bölümünü Mantine bileşenleri ile değiştirelim */}
-      <Stack align="center" mt="xl">
-        <Button
-          variant="gradient"
-          gradient={{ from: 'blue', to: 'cyan', deg: 90 }}
-          component="a"
-          href="https://electron-vite.org/"
-          target="_blank"
-          rel="noreferrer"
-        >
-          Documentation
+        <TextInput
+          label="Adınızı Girin"
+          placeholder="Örn: Ahmet"
+          value={name}
+          onChange={(event): void => setName(event.currentTarget.value)}
+          mt="md"
+        />
+
+        <Button onClick={handleButtonClick} mt="sm">
+          Selamlama İsteği Gönder
         </Button>
-        <Button variant="outline" onClick={ipcHandle}>
-          Send IPC
-        </Button>
+
+        {greeting && (
+          <Text mt="lg" c="blue" ta="center">
+            {greeting}
+          </Text>
+        )}
       </Stack>
-
-      <Versions />
-    </>
+    </Container>
   )
 }
 
