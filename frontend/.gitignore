@@ -60,3 +60,9 @@ pids
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+# Cross-directory ignore rules
+*.pid.lock
+backend/app/generated/
+frontend/package-lock.json
+backend/package-lock.json
+frontend/out/renderer/assets/
