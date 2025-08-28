@@ -1,28 +1,35 @@
 import { useState } from 'react'
-import { Container, Title, Stack, Button, Text } from '@mantine/core'
+import { Container, Title, Stack, Button, Text, Code } from '@mantine/core'
 
 function App(): React.JSX.Element {
-  const [osInfo, setOsInfo] = useState('')
+  const [backendResponse, setBackendResponse] = useState<string | null>(null)
 
-  const handleButtonClick = async (): Promise<void> => {
-    const response = await window.api.getOsInfo()
-    setOsInfo(response)
+  const handleBackendTestClick = async (): Promise<void> => {
+    try {
+      // NestJS backend'i varsayılan olarak 3000 portunda çalışır
+      const response = await fetch('http://localhost:3000/test-db')
+      const data = await response.json()
+      setBackendResponse(JSON.stringify(data, null, 2))
+    } catch (error) {
+      console.error('Backend ile iletişim kurulamadı:', error)
+      setBackendResponse('Hata: Backend sunucusuna bağlanılamadı. Çalıştığından emin olun.')
+    }
   }
 
   return (
     <Container>
       <Stack align="center">
         <Title order={1}>Restoran POS Sistemi</Title>
-        <Text c="dimmed">Backend ile İletişim Testi</Text>
+        <Text c="dimmed">NestJS Backend Bağlantı Testi</Text>
 
-        <Button onClick={handleButtonClick} mt="xl">
-          İşletim Sistemi Bilgisini Al
+        <Button onClick={handleBackendTestClick} mt="xl">
+          Backend'den Veritabanı Durumunu Al
         </Button>
 
-        {osInfo && (
-          <Text mt="lg" c="blue" ta="center">
-            {osInfo}
-          </Text>
+        {backendResponse && (
+          <Code block mt="lg">
+            {backendResponse}
+          </Code>
         )}
       </Stack>
     </Container>
