@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
-  imports: [],
+  imports: [PrismaModule], // PrismaModule'ü buraya ekleyin
   controllers: [AppController],
   providers: [AppService],
 })
