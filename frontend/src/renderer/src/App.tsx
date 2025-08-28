@@ -1,3 +1,4 @@
+import { Button, Stack } from '@mantine/core'
 import Versions from './components/Versions'
 import electronLogo from './assets/electron.svg'
 
@@ -15,19 +16,25 @@ function App(): React.JSX.Element {
       <p className="tip">
         Please try pressing <code>F12</code> to open the devTool
       </p>
-      <div className="actions">
-        <div className="action">
-          <a href="https://electron-vite.org/" target="_blank" rel="noreferrer">
-            Documentation
-          </a>
-        </div>
-        <div className="action">
-          <a target="_blank" rel="noreferrer" onClick={ipcHandle}>
-            Send IPC
-          </a>
-        </div>
-      </div>
-      <Versions></Versions>
+
+      {/* Mevcut actions bölümünü Mantine bileşenleri ile değiştirelim */}
+      <Stack align="center" mt="xl">
+        <Button
+          variant="gradient"
+          gradient={{ from: 'blue', to: 'cyan', deg: 90 }}
+          component="a"
+          href="https://electron-vite.org/"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Documentation
+        </Button>
+        <Button variant="outline" onClick={ipcHandle}>
+          Send IPC
+        </Button>
+      </Stack>
+
+      <Versions />
     </>
   )
 }
