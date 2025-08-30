@@ -30,8 +30,7 @@ export function LoginForm() {
           placeholder="E-posta adresinizi girin"
           value={email}
           onChange={(event) => setEmail(event.currentTarget.value)}
-          radius="md"
-          size="md"
+          // radius ve size kaldırıldı, çünkü temadan geliyor
         />
         <PasswordInput
           required
@@ -39,8 +38,7 @@ export function LoginForm() {
           placeholder="Şifrenizi girin"
           value={password}
           onChange={(event) => setPassword(event.currentTarget.value)}
-          radius="md"
-          size="md"
+          // radius ve size kaldırıldı, çünkü temadan geliyor
         />
         <Group justify="space-between">
           <Checkbox
@@ -57,7 +55,6 @@ export function LoginForm() {
           Giriş Yap
         </Button>
 
-        {/* Sadeleştirilmiş Kayıt Ol Butonu */}
         <Button fullWidth variant="default">
           Kayıt Ol
         </Button>
