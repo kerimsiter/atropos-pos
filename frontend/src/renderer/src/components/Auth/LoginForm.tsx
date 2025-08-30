@@ -24,6 +24,7 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit}>
       <Stack gap="lg">
+
         <TextInput
           required
           label="E-posta Adresi"

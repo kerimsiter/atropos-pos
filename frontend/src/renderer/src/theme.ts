@@ -1,123 +1,112 @@
 // frontend/src/renderer/src/theme.ts
 import { createTheme, rem } from '@mantine/core';
 
+// Yeni Renk Paletimiz - Referans Tasarımdan
+const themeColors = {
+  brand: [
+    '#e8f6ed', '#c7e9d4', '#9bd7b1', '#6cc58d',
+    '#40b46b', '#16a34a', '#138b3f', '#107435',
+    '#0d5d2a', '#0a4921',
+  ] as const,
+  neutral: [
+    '#ffffff', '#fdfdfd', '#f5f6f6', '#e8f2f2',
+    '#dadddc', '#c1c6c5', '#5d6b68', '#495955',
+    '#2b3d39', '#243632',
+  ] as const,
+};
+
 export const theme = createTheme({
-  // 1. Renk Paleti
+  // 1. Renk Paleti - YENİ
   colors: {
-    // Tasarım sistemindeki 'Primary' rengini 'brand' olarak tanımlıyoruz
-    brand: [
-      '#F2FAF5', // brand[0] - Primary 50
-      '#E6F5EB', // brand[1]
-      '#C1E6CF', // brand[2]
-      '#9BD8B3', // brand[3]
-      '#74CA97', // brand[4]
-      '#4DBD7B', // brand[5] - Primary 500'e en yakın
-      '#30B55B', // brand[6] - **ANA RENK (Primary 500)**
-      '#29A150', // brand[7]
-      '#228D45', // brand[8]
-      '#1B793A', // brand[9] - Primary 900'e en yakın
-    ],
+    brand: themeColors.brand,
+    neutral: themeColors.neutral,
   },
 
   // Ana rengimiz 'brand' (yeşil) olacak
   primaryColor: 'brand',
-  primaryShade: 6, // Ana renk olarak brand[6]'yı kullan
+  primaryShade: 5, // Yeni ana renk #16a34a
 
   // 2. Tipografi (URBANIST YAZI TİPİ)
   fontFamily: "'Urbanist', sans-serif",
   headings: {
     fontFamily: "'Urbanist', sans-serif",
-    fontWeight: '600', // Semi-bold - daha zarif görünüm için
+    fontWeight: '700', // Başlıkları daha belirgin yapalım
   },
 
   // 3. Bileşen Stilleri (Global) - ÇOK BÜYÜK VE CANLI TASARIM
   components: {
-    // === BUTONLAR - ÇOK BÜYÜK VE ETKİLEŞİMLİ ===
+    // === BUTONLAR - YENİ RENK PALETİYLE ===
     Button: {
       defaultProps: {
         radius: 'md',
-        size: 'xl', // Çok büyük butonlar
+        size: 'xl',
       },
       styles: {
         root: {
-          height: rem(56), // Çok yüksek butonlar (50px'den daha büyük)
-          fontSize: rem(18), // Büyük yazı
-          fontWeight: 600, // Kalın yazı
-          transition: 'transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease',
-          // Hover efekti - buton yukarı kalksın ve gölge eklensin
+          height: rem(56),
+          fontSize: rem(18),
+          fontWeight: 600,
+          transition: 'transform 0.15s ease, box-shadow 0.15s ease',
           '&:hover': {
             transform: 'translateY(-2px)',
-            boxShadow: '0 8px 20px rgba(48, 181, 91, 0.3)', // Marka renginde gölge
-          },
-          // Focus efekti - daha belirgin olsun
-          '&:focus': {
-            transform: 'translateY(-1px)',
-            boxShadow: '0 4px 12px rgba(48, 181, 91, 0.4)',
+            boxShadow: `0 8px 20px rgba(22, 163, 74, 0.25)`, // Yeni marka rengiyle gölge
           },
         },
       },
     },
 
-    // === GİRİŞ ALANLARI - ÇOK BÜYÜK VE CANLI ===
+    // === GİRİŞ ALANLARI - YENİ STİL: Gri Arkaplan, Kenarlıksız ===
     TextInput: {
       defaultProps: {
         radius: 'md',
-        size: 'xl', // Çok büyük input alanları
+        size: 'xl',
+        variant: 'filled', // Kenarlığı kaldırıp arkaplan rengi vermemizi sağlar
       },
       styles: {
         input: {
-          height: rem(56), // Çok yüksek input'lar (50px'den daha büyük)
-          fontSize: rem(16), // Büyük yazı
-          fontWeight: 500, // Orta kalınlık
-          transition: 'border-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease',
-          // Focus efekti - marka renginde çerçeve ve gölge
-          '&:focus': {
-            borderColor: 'var(--mantine-color-brand-6)',
-            boxShadow: `0 0 0 ${rem(3)} rgba(48, 181, 91, 0.2)`,
-            transform: 'translateY(-1px)',
-          },
-          // Hover efekti - hafif gölge
-          '&:hover': {
-            boxShadow: `0 2px 8px rgba(0, 0, 0, 0.08)`,
+          backgroundColor: themeColors.neutral[2], // #f5f6f6 gri arkaplan
+          height: rem(56),
+          fontSize: rem(16),
+          fontWeight: 500,
+          border: '1px solid transparent', // Varsayılan kenarlığı şeffaf yap
+          transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+          '&:focus, &:focus-within': {
+            borderColor: 'var(--mantine-color-brand-5)', // Odaklanınca yeşil kenarlık
+            boxShadow: `0 0 0 ${rem(3)} rgba(22, 163, 74, 0.15)`,
           },
         },
         label: {
-          fontSize: rem(16), // Büyük label
-          fontWeight: 600, // Kalın label
-          marginBottom: rem(10), // Label ile input arası daha fazla boşluk
-          transition: 'color 0.15s ease',
+          fontSize: rem(16),
+          fontWeight: 600,
+          marginBottom: rem(10),
         },
       },
     },
 
-    // === ŞİFRE ALANLARI - ÇOK BÜYÜK VE CANLI ===
+    // === ŞİFRE ALANLARI - YENİ STİL ===
     PasswordInput: {
       defaultProps: {
         radius: 'md',
-        size: 'xl', // Çok büyük şifre alanları
+        size: 'xl',
+        variant: 'filled',
       },
       styles: {
         input: {
-          height: rem(56), // Çok yüksek şifre input'ları
-          fontSize: rem(16), // Büyük yazı
-          fontWeight: 500, // Orta kalınlık
-          transition: 'border-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease',
-          // Focus efekti - marka renginde çerçeve ve gölge
-          '&:focus': {
-            borderColor: 'var(--mantine-color-brand-6)',
-            boxShadow: `0 0 0 ${rem(3)} rgba(48, 181, 91, 0.2)`,
-            transform: 'translateY(-1px)',
-          },
-          // Hover efekti - hafif gölge
-          '&:hover': {
-            boxShadow: `0 2px 8px rgba(0, 0, 0, 0.08)`,
+          backgroundColor: themeColors.neutral[2],
+          height: rem(56),
+          fontSize: rem(16),
+          fontWeight: 500,
+          border: '1px solid transparent',
+          transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+          '&:focus, &:focus-within': {
+            borderColor: 'var(--mantine-color-brand-5)',
+            boxShadow: `0 0 0 ${rem(3)} rgba(22, 163, 74, 0.15)`,
           },
         },
         label: {
-          fontSize: rem(16), // Büyük label
-          fontWeight: 600, // Kalın label
-          marginBottom: rem(10), // Label ile input arası daha fazla boşluk
-          transition: 'color 0.15s ease',
+          fontSize: rem(16),
+          fontWeight: 600,
+          marginBottom: rem(10),
         },
       },
     },
