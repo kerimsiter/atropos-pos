@@ -1,15 +1,13 @@
-// frontend/src/renderer/src/pages/Auth/Login.tsx
 import { Grid, Box, Flex } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { AuthShowcasePanel } from '../../components/Auth/AuthShowcasePanel';
-import { LoginForm } from '../../components/Auth/LoginForm';
+import { RegisterForm } from '../../components/Auth/RegisterForm';
 import { AuthHeader } from '../../components/Auth/AuthHeader';
 
-export function LoginPage(): React.JSX.Element {
+export function RegisterPage(): React.JSX.Element {
   const isMobile = useMediaQuery('(max-width: 768px)');
   
   return (
-    // Ana Grid, en dıştaki arkaplanı belirler
     <Grid gutter={0} bg="neutral.2">
       {/* Sol Sütun: Form Alanı */}
       <Grid.Col
@@ -18,8 +16,6 @@ export function LoginPage(): React.JSX.Element {
         style={{ position: 'relative' }}
       >
         <AuthHeader />
-
-        {/* İçeriği dikeyde ortalamak için Flex container */}
         <Flex
           direction="column"
           justify="center"
@@ -29,7 +25,6 @@ export function LoginPage(): React.JSX.Element {
             padding: isMobile ? '80px 16px 24px 16px' : '24px' 
           }}
         >
-          {/* Formu ve başlıkları saran kutu */}
           <Box
             style={{
               maxWidth: isMobile ? '100%' : '427px',
@@ -37,7 +32,7 @@ export function LoginPage(): React.JSX.Element {
               margin: '0 auto',
             }}
           >
-            <LoginForm />
+            <RegisterForm />
           </Box>
         </Flex>
       </Grid.Col>

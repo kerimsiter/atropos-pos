@@ -1,5 +1,7 @@
 // frontend/src/renderer/src/components/Auth/LoginForm.tsx
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useMediaQuery } from '@mantine/hooks';
 import {
   TextInput,
   PasswordInput,
@@ -13,6 +15,10 @@ import {
 } from '@mantine/core';
 
 export function LoginForm() {
+  const navigate = useNavigate(); // Yönlendirme için hook
+  const isMobile = useMediaQuery('(max-width: 480px)');
+  const isTablet = useMediaQuery('(max-width: 768px)');
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
@@ -27,11 +33,28 @@ export function LoginForm() {
     <form onSubmit={handleSubmit}>
       <Stack gap="lg">
         {/* Hoşgeldin Mesajı */}
-        <Stack gap="xs" align="center" mb="lg">
-          <Title order={3} size="24px" c="dark.8" ta="center" style={{ lineHeight: '32px', fontWeight: 600 }}>
+        <Stack gap="xs" align="center" mb={isTablet ? 'md' : 'lg'}>
+          <Title 
+            order={2} 
+            size={isMobile ? '28px' : '32px'} 
+            c="dark.8" 
+            ta="center" 
+            style={{ 
+              lineHeight: isMobile ? '36px' : '40px', 
+              fontWeight: 600 
+            }}
+          >
             Hoşgeldiniz
           </Title>
-          <Text c="neutral.6" size="14px" ta="center" style={{ lineHeight: '20px', maxWidth: '280px' }}>
+          <Text 
+            c="neutral.6" 
+            size={isMobile ? '14px' : '16px'} 
+            ta="center" 
+            style={{ 
+              lineHeight: isMobile ? '20px' : '24px', 
+              maxWidth: isMobile ? '280px' : '320px'
+            }}
+          >
             Lütfen üyelik bilgileriniz ile giriş yapınız
           </Text>
         </Stack>
@@ -52,22 +75,23 @@ export function LoginForm() {
           onChange={(event) => setPassword(event.currentTarget.value)}
           // radius ve size kaldırıldı, çünkü temadan geliyor
         />
-        <Group justify="space-between">
+        <Group justify="space-between" align={isMobile ? 'flex-start' : 'center'} style={{ flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? '12px' : '0' }}>
           <Checkbox
             label="Beni Hatırla"
             checked={rememberMe}
             onChange={(event) => setRememberMe(event.currentTarget.checked)}
+            size={isMobile ? 'sm' : 'md'}
           />
           <Anchor component="button" size="sm" c="brand">
             Şifremi unuttum
           </Anchor>
         </Group>
 
-        <Button fullWidth mt="xl" type="submit">
+        <Button fullWidth mt={isTablet ? 'lg' : 'xl'} type="submit" size={isMobile ? 'md' : 'lg'}>
           Giriş Yap
         </Button>
 
-        <Button fullWidth variant="default">
+        <Button fullWidth variant="default" onClick={() => navigate('/register')} size={isMobile ? 'md' : 'lg'}>
           Kayıt Ol
         </Button>
       </Stack>

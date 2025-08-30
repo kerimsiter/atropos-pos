@@ -1,6 +1,7 @@
 // frontend/src/renderer/src/components/Auth/AuthShowcasePanel.tsx
 import { useState, useEffect } from 'react';
 import { Box, Stack, Title, Text, Image, Center, Flex } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import showcaseImage from '../../assets/product-showcase.png';
 
 const showcaseTexts = [
@@ -13,13 +14,15 @@ const showcaseTexts = [
     subtitle: 'Anlık stok takibi, tedarikçi yönetimi ve kritik seviye uyarıları ile daima bir adım önde olun.',
   },
   {
-    title: 'Raporlar Parmaklarınızın Ucunda',
+    title: 'Raporlar Parmağınızın Ucunda',
     subtitle: 'Günlük, haftalık ve aylık satış raporları ile işletmenizin performansını anlık olarak izleyin.',
   },
 ];
 
 export function AuthShowcasePanel() {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const isTablet = useMediaQuery('(max-width: 1024px)');
+  const isDesktop = useMediaQuery('(min-width: 1200px)');
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -30,27 +33,37 @@ export function AuthShowcasePanel() {
   }, []);
 
   return (
-    <Center style={{ height: '100%', padding: 'var(--mantine-spacing-xl)' }}>
-      <Stack align="center" gap="xl" style={{ maxWidth: '500px' }}>
+    <Center style={{ 
+      height: '100%', 
+      padding: isTablet ? 'var(--mantine-spacing-md)' : 'var(--mantine-spacing-xl)'
+    }}>
+      <Stack 
+        align="center" 
+        gap={isTablet ? 'md' : 'xl'} 
+        style={{ 
+          maxWidth: isDesktop ? '600px' : '500px',
+          width: '100%'
+        }}
+      >
         {/* Ana başlık ve açıklama */}
         <Box ta="center" style={{ width: '100%' }}>
           <Title
             order={2}
-            size="40px"
+            size={isTablet ? '32px' : '40px'}
             style={{
-              lineHeight: '48px',
+              lineHeight: isTablet ? '40px' : '48px',
               fontWeight: 500,
-              marginBottom: '20px'
+              marginBottom: isTablet ? '16px' : '20px'
             }}
           >
             {showcaseTexts[currentIndex].title}
           </Title>
           <Text
-            size="16px"
+            size={isTablet ? '14px' : '16px'}
             style={{
-              lineHeight: '24px',
+              lineHeight: isTablet ? '20px' : '24px',
               opacity: 0.7,
-              maxWidth: '500px'
+              maxWidth: isTablet ? '400px' : '500px'
             }}
           >
             {showcaseTexts[currentIndex].subtitle}
@@ -63,7 +76,7 @@ export function AuthShowcasePanel() {
             <Box
               key={index}
               style={{
-                width: index === currentIndex ? '24px' : '6px',
+                width: index === currentIndex ? (isTablet ? '20px' : '24px') : '6px',
                 height: '6px',
                 borderRadius: index === currentIndex ? '3px' : '50%',
                 backgroundColor: index === currentIndex ? '#16a34a' : '#dadddc',
@@ -77,13 +90,15 @@ export function AuthShowcasePanel() {
         <Box style={{ position: 'relative', width: '100%' }}>
           <Image
             src={showcaseImage}
-            radius="16px"
+            radius={isTablet ? '12px' : '16px'}
             style={{
               width: '100%',
-              maxWidth: '600px',
-              boxShadow: '0 16px 32px -12px rgba(14, 18, 27, 0.1)',
-              border: '4px solid white',
-              borderRadius: '20px',
+              maxWidth: isDesktop ? '600px' : '500px',
+              boxShadow: isTablet 
+                ? '0 8px 16px -6px rgba(14, 18, 27, 0.1)' 
+                : '0 16px 32px -12px rgba(14, 18, 27, 0.1)',
+              border: isTablet ? '3px solid white' : '4px solid white',
+              borderRadius: isTablet ? '16px' : '20px',
             }}
           />
         </Box>
