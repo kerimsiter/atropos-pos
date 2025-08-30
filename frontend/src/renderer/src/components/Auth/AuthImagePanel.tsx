@@ -1,6 +1,6 @@
 // frontend/src/renderer/src/components/Auth/AuthImagePanel.tsx
 import { Box, Title, Text, Stack } from '@mantine/core';
-import authImage from '../../assets/auth-image.svg'; // Görseli import et
+import authImage from '../../assets/auth-image.jpg'; // Görseli import et
 
 const overlayStyle: React.CSSProperties = {
   position: 'absolute',
