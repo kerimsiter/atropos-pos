@@ -27,7 +27,7 @@ export const theme = createTheme({
   fontFamily: "'Plus Jakarta Sans', sans-serif",
   headings: {
     fontFamily: "'Plus Jakarta Sans', sans-serif",
-    fontWeight: '700', // Varsayılan olarak başlıklar Bold olsun
+    fontWeight: '600', // Semi-bold - daha zarif görünüm için
   },
 
   // 3. Bileşen Stilleri (Global)
