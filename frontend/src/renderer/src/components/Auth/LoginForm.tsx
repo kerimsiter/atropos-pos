@@ -8,6 +8,8 @@ import {
   Stack,
   Group,
   Anchor,
+  Text,
+  Title,
 } from '@mantine/core';
 
 export function LoginForm() {
@@ -24,6 +26,15 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit}>
       <Stack gap="lg">
+        {/* Hoşgeldin Mesajı */}
+        <Stack gap="xs" align="center" mb="lg">
+          <Title order={3} size="24px" c="dark.8" ta="center" style={{ lineHeight: '32px', fontWeight: 600 }}>
+            Hoşgeldiniz
+          </Title>
+          <Text c="neutral.6" size="14px" ta="center" style={{ lineHeight: '20px', maxWidth: '280px' }}>
+            Lütfen üyelik bilgileriniz ile giriş yapınız
+          </Text>
+        </Stack>
 
         <TextInput
           required

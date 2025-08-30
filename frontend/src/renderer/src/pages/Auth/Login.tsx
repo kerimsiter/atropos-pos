@@ -1,8 +1,9 @@
 // frontend/src/renderer/src/pages/Auth/Login.tsx
-import { Grid, Stack, Title, Text, Box, Flex, Image } from '@mantine/core';
+import { Grid, Box, Flex } from '@mantine/core';
 import { AuthShowcasePanel } from '../../components/Auth/AuthShowcasePanel';
 import { LoginForm } from '../../components/Auth/LoginForm';
-import logo from '../../assets/logo.svg';
+// YENİ: AuthHeader import edildi
+import { AuthHeader } from '../../components/Auth/AuthHeader';
 
 export function LoginPage(): React.JSX.Element {
   return (
@@ -10,40 +11,31 @@ export function LoginPage(): React.JSX.Element {
     <Grid gutter={0} bg="neutral.2">
       {/* Sol Sütun: Form Alanı */}
       <Grid.Col
-        span={{ base: 12, md: 6, lg: 5 }} // Geniş ekranlarda daha dar
-        bg="white" // Sol panelin arkaplanı beyaz
+        span={{ base: 12, md: 6, lg: 5 }}
+        bg="white"
+        // YENİ: Header'ın doğru konumlanması için bu gerekli
+        style={{ position: 'relative' }}
       >
-        {/* İçeriği dikeyde ortalamak için Flex container */}
+        {/* YENİ: Header bileşeni eklendi */}
+        <AuthHeader />
+
+        {/* İçeriği dikeyde ortalamak için Flex container (DEĞİŞİKLİK YOK) */}
         <Flex
           direction="column"
           justify="center"
           style={{ height: '100vh', padding: '24px' }}
         >
-          {/* Formu ve başlıkları saran, yuvarlatılmış kutu */}
+          {/* Formu ve başlıkları saran kutu (DEĞİŞİKLİK YOK) */}
           <Box
             style={{
-              maxWidth: '427px', // Yeni Figma tasarımındaki genişlik
+              maxWidth: '427px',
               width: '100%',
               margin: '0 auto',
-              padding: '20px',
-              borderRadius: '24px', // Yuvarlatılmış köşeler
-              backgroundColor: 'white',
             }}
           >
-            {/* Logo ve başlık bölümü */}
-            <Stack align="center" gap="md" mb="lg">
-              <Image src={logo} h={48} w="auto" fit="contain" />
-              <Stack gap={4} align="center">
-                <Title order={2} size="32px" style={{ lineHeight: '40px', fontWeight: 500 }}>
-                  Giriş Yap
-                </Title>
-                <Text c="neutral.6" size="16px" style={{ lineHeight: '24px' }}>
-                  İşletmenizi yönetmeye devam edin.
-                </Text>
-              </Stack>
-            </Stack>
-
-            {/* Form Bileşeni */}
+            {/* Logo ve başlık artık LoginForm'un içinde değil, formun kendisinde yer alıyor */}
+            {/* Bu kısım LoginForm'dan buraya taşınabilir veya LoginForm'da kalabilir.
+                Mevcut haliyle de çalışır. Temizlik için LoginForm'daki başlığı kaldırabiliriz. */}
             <LoginForm />
           </Box>
         </Flex>
