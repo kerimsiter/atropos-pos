@@ -1,3 +1,32 @@
 @import './base.css';
 
 /* CSS temizlendi - LoginPage kendi styling'ini kullanacak */
+
+/* Phone Input Styling */
+.react-international-phone-input-container {
+  height: 56px;
+}
+
+.react-international-phone-input {
+  height: 56px !important;
+  font-size: 16px !important;
+  border-radius: 8px !important;
+  border: 1px solid #dee2e6 !important;
+  padding-left: 70px !important;
+}
+
+.react-international-phone-country-selector-button {
+  border-radius: 8px 0 0 8px !important;
+  border: 1px solid #dee2e6 !important;
+  border-right: none !important;
+  height: 56px !important;
+}
+
+.react-international-phone-input:focus {
+  border-color: #228be6 !important;
+  outline: none !important;
+}
+
+.react-international-phone-country-selector-button:hover {
+  background-color: #f8f9fa !important;
+}

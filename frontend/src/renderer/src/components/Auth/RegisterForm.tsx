@@ -11,7 +11,11 @@ import {
   Text,
   Title,
   Group,
+  rem,
 } from '@mantine/core';
+// YENİ: Telefon numarası bileşenini import ediyoruz
+import { PhoneInput } from 'react-international-phone';
+import 'react-international-phone/style.css';
 
 export function RegisterForm() {
   const navigate = useNavigate(); // Yönlendirme için hook
@@ -22,6 +26,8 @@ export function RegisterForm() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
+  // YENİ: Telefon numarası için state
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [termsAccepted, setTermsAccepted] = useState(false);
 
@@ -32,6 +38,7 @@ export function RegisterForm() {
       firstName,
       lastName,
       email,
+      phone, // Konsola telefon numarasını da yazdır
       password,
       termsAccepted,
     });
@@ -101,6 +108,24 @@ export function RegisterForm() {
           value={email}
           onChange={(event) => setEmail(event.currentTarget.value)}
         />
+
+        {/* YENİ: Telefon Numarası Giriş Alanı */}
+        <div>
+          <Text component="label" size="sm" fw={500} mb={5}>
+            Telefon Numarası <span style={{ color: 'red' }}>*</span>
+          </Text>
+          <PhoneInput
+            defaultCountry="tr"
+            value={phone}
+            onChange={(phone) => setPhone(phone)}
+            placeholder="Telefon numaranızı girin"
+            inputClassName="mantine-phone-input"
+            style={{
+              '--react-international-phone-height': '56px',
+              '--react-international-phone-font-size': '16px',
+            } as React.CSSProperties}
+          />
+        </div>
 
         <PasswordInput
           required

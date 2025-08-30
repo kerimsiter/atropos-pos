@@ -129,7 +129,7 @@ model User {
   firstName         String // [cite: 27]
   lastName          String // [cite: 28]
   email             String? // [cite: 29]
-  phone             String? // [cite: 30]
+  phone             String   @unique // YENİ: Telefonu zorunlu ve benzersiz yaptık
   avatar            String? // [cite: 31]
   role              UserRole // [cite: 32]
   permissions       Json? // Detaylı yetki matrisi // [cite: 33]
