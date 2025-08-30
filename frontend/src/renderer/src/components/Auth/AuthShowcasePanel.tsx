@@ -1,6 +1,6 @@
 // frontend/src/renderer/src/components/Auth/AuthShowcasePanel.tsx
 import { useState, useEffect } from 'react';
-import { Box, Stack, Title, Text, Image, Center, Flex } from '@mantine/core';
+import { Box, Stack, Title, Text, Image, Flex } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import showcaseImage from '../../assets/product-showcase.png';
 
@@ -27,22 +27,32 @@ export function AuthShowcasePanel() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % showcaseTexts.length);
-    }, 5000); // Her 5 saniyede bir yazıyı değiştir
+    }, 5000);
 
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <Center style={{ 
-      height: '100%', 
-      padding: isTablet ? 'var(--mantine-spacing-md)' : 'var(--mantine-spacing-xl)'
-    }}>
-      <Stack 
-        align="center" 
-        gap={isTablet ? 'md' : 'xl'} 
-        style={{ 
+    // Ana konteyner, içeriği ortalamak ve konumlandırmak için Flex kullanıyor
+    <Flex
+      direction="column"
+      justify="center"
+      align="center"
+      style={{
+        height: '100%',
+        padding: isTablet ? 'var(--mantine-spacing-md)' : 'var(--mantine-spacing-xl)',
+        position: 'relative', // Konumlandırma için
+        overflow: 'hidden', // Taşmaları engellemek için
+      }}
+    >
+      <Stack
+        align="center"
+        gap={isTablet ? 'md' : 'xl'}
+        style={{
           maxWidth: isDesktop ? '600px' : '500px',
-          width: '100%'
+          width: '100%',
+          position: 'relative',
+          zIndex: 2, // Resmin üzerinde kalması için
         }}
       >
         {/* Ana başlık ve açıklama */}
@@ -53,7 +63,7 @@ export function AuthShowcasePanel() {
             style={{
               lineHeight: isTablet ? '40px' : '48px',
               fontWeight: 500,
-              marginBottom: isTablet ? '16px' : '20px'
+              marginBottom: isTablet ? '16px' : '20px',
             }}
           >
             {showcaseTexts[currentIndex].title}
@@ -63,7 +73,7 @@ export function AuthShowcasePanel() {
             style={{
               lineHeight: isTablet ? '20px' : '24px',
               opacity: 0.7,
-              maxWidth: isTablet ? '400px' : '500px'
+              maxWidth: isTablet ? '400px' : '500px',
             }}
           >
             {showcaseTexts[currentIndex].subtitle}
@@ -85,24 +95,26 @@ export function AuthShowcasePanel() {
             />
           ))}
         </Flex>
-
-        {/* Büyük ürün görseli */}
-        <Box style={{ position: 'relative', width: '100%' }}>
-          <Image
-            src={showcaseImage}
-            radius={isTablet ? '12px' : '16px'}
-            style={{
-              width: '100%',
-              maxWidth: isDesktop ? '600px' : '500px',
-              boxShadow: isTablet 
-                ? '0 8px 16px -6px rgba(14, 18, 27, 0.1)' 
-                : '0 16px 32px -12px rgba(14, 18, 27, 0.1)',
-              border: isTablet ? '3px solid white' : '4px solid white',
-              borderRadius: isTablet ? '16px' : '20px',
-            }}
-          />
-        </Box>
       </Stack>
-    </Center>
+
+      {/* YENİ: Genişletilmiş ve konumlandırılmış ürün görseli */}
+      <Image
+        src={showcaseImage}
+        radius={isTablet ? '12px' : '16px'}
+        style={{
+          position: 'absolute',
+          bottom: '-10%', // Alt kenardan aşağıya taşıyor
+          right: '-15%',  // Sağ kenardan dışarı taşıyor
+          width: '110%',  // Genişliğini artırarak taşma efekti sağlıyor
+          maxWidth: '800px', // Çok fazla büyümesini engelle
+          boxShadow: isTablet
+            ? '0 8px 16px -6px rgba(14, 18, 27, 0.1)'
+            : '0 16px 32px -12px rgba(14, 18, 27, 0.1)',
+          border: isTablet ? '3px solid white' : '4px solid white',
+          borderRadius: isTablet ? '16px' : '20px',
+          zIndex: 1, // Metinlerin arkasında kalması için
+        }}
+      />
+    </Flex>
   );
 }
