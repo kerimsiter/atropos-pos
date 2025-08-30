@@ -8,10 +8,8 @@ import {
   Stack,
   Group,
   Anchor,
-  Divider,
   Text,
 } from '@mantine/core';
-import { IconBrandGoogle } from '@tabler/icons-react';
 
 export function LoginForm() {
   const [email, setEmail] = useState('');
@@ -20,8 +18,8 @@ export function LoginForm() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Login attempt:', { email, password, rememberMe });
-    // TODO: Implement login logic
+    console.log('Giriş denemesi:', { email, password, rememberMe });
+    // TODO: Giriş yapma mantığı buraya eklenecek
   };
 
   return (
@@ -29,8 +27,8 @@ export function LoginForm() {
       <Stack gap="lg">
         <TextInput
           required
-          label="Email or Phone Number"
-          placeholder="Enter your phone number"
+          label="E-posta Adresi"
+          placeholder="E-posta adresinizi girin"
           value={email}
           onChange={(event) => setEmail(event.currentTarget.value)}
           radius="md"
@@ -38,8 +36,8 @@ export function LoginForm() {
         />
         <PasswordInput
           required
-          label="Password"
-          placeholder="Enter your password"
+          label="Şifre"
+          placeholder="Şifrenizi girin"
           value={password}
           onChange={(event) => setPassword(event.currentTarget.value)}
           radius="md"
@@ -47,36 +45,25 @@ export function LoginForm() {
         />
         <Group justify="space-between">
           <Checkbox
-            label="Remember me"
+            label="Beni Hatırla"
             checked={rememberMe}
             onChange={(event) => setRememberMe(event.currentTarget.checked)}
           />
           <Anchor component="button" size="sm" c="brand">
-            Forgot password?
+            Şifremi unuttum
           </Anchor>
         </Group>
 
         <Button fullWidth size="md" mt="xl" type="submit">
-          Login
+          Giriş Yap
         </Button>
 
         <Text size="sm" c="dimmed" ta="center">
-          Don't have an account?{' '}
+          Hesabınız yok mu?{' '}
           <Anchor component="button" c="brand" fw={500}>
-            Sign Up
+            Kayıt Ol
           </Anchor>
         </Text>
-
-        <Divider label="Or" labelPosition="center" my="sm" />
-
-        <Button
-          fullWidth
-          size="md"
-          variant="default"
-          leftSection={<IconBrandGoogle size={16} />}
-        >
-          Continue With Google
-        </Button>
       </Stack>
     </form>
   );

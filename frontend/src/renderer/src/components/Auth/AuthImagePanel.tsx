@@ -29,10 +29,10 @@ export function AuthImagePanel() {
         style={{ height: '100%', position: 'relative', zIndex: 2, padding: 'var(--mantine-spacing-xl)' }}
       >
         <Title order={1} c="white">
-          Stay In Control
+          Kontrol Sizde Kalsın
         </Title>
         <Text size="lg" c="dimmed">
-          Easily manage your store anytime, anywhere with a seamless login experience.
+          İşletmenizi dilediğiniz zaman, dilediğiniz yerden sorunsuz bir giriş deneyimiyle kolayca yönetin.
         </Text>
       </Stack>
     </Box>

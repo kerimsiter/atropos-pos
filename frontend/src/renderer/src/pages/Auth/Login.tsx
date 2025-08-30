@@ -19,8 +19,8 @@ export function LoginPage(): React.JSX.Element {
 
           {/* Başlık */}
           <Stack gap="xs" mt="xl" mb="xl">
-            <Title order={2}>Login</Title>
-            <Text c="dimmed">Access your account to continue</Text>
+            <Title order={2}>Giriş Yap</Title>
+            <Text c="dimmed">Devam etmek için hesabınıza erişin</Text>
           </Stack>
 
           {/* Form Bileşeni */}
