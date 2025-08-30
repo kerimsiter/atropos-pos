@@ -8,7 +8,6 @@ import {
   Stack,
   Group,
   Anchor,
-  Text,
 } from '@mantine/core';
 
 export function LoginForm() {
@@ -54,16 +53,14 @@ export function LoginForm() {
           </Anchor>
         </Group>
 
-        <Button fullWidth size="md" mt="xl" type="submit">
+        <Button fullWidth mt="xl" type="submit">
           Giriş Yap
         </Button>
 
-        <Text size="sm" c="dimmed" ta="center">
-          Hesabınız yok mu?{' '}
-          <Anchor component="button" c="brand" fw={500}>
-            Kayıt Ol
-          </Anchor>
-        </Text>
+        {/* Sadeleştirilmiş Kayıt Ol Butonu */}
+        <Button fullWidth variant="default">
+          Kayıt Ol
+        </Button>
       </Stack>
     </form>
   );

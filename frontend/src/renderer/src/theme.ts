@@ -23,10 +23,10 @@ export const theme = createTheme({
   primaryColor: 'brand',
   primaryShade: 6, // Ana renk olarak brand[6]'yı kullan
 
-  // 2. Tipografi
-  fontFamily: "'Plus Jakarta Sans', sans-serif",
+  // 2. Tipografi (URBANIST YAZI TİPİ)
+  fontFamily: "'Urbanist', sans-serif",
   headings: {
-    fontFamily: "'Plus Jakarta Sans', sans-serif",
+    fontFamily: "'Urbanist', sans-serif",
     fontWeight: '600', // Semi-bold - daha zarif görünüm için
   },
 
@@ -132,7 +132,7 @@ export const theme = createTheme({
           height: rem(20), // Daha büyük checkbox
         },
         label: {
-          fontFamily: "'Plus Jakarta Sans', sans-serif",
+          fontFamily: "'Urbanist', sans-serif", // Urbanist yazı tipi
           fontWeight: 600, // Kalın yazı
           fontSize: rem(16), // Büyük yazı
           color: '#141414',
