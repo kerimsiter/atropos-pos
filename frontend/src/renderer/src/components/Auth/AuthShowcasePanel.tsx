@@ -1,6 +1,6 @@
 // frontend/src/renderer/src/components/Auth/AuthShowcasePanel.tsx
 import { useState, useEffect } from 'react';
-import { Box, Stack, Title, Text, Image, Center, Flex } from '@mantine/core';
+import { Box, Stack, Title, Text, Image, Flex } from '@mantine/core';
 import showcaseImage from '../../assets/product-showcase.png';
 
 const showcaseTexts = [
@@ -30,64 +30,50 @@ export function AuthShowcasePanel() {
   }, []);
 
   return (
-    <Center style={{ height: '100%', padding: 'var(--mantine-spacing-xl)' }}>
-      <Stack align="center" gap="xl" style={{ maxWidth: '500px' }}>
-        {/* Ana başlık ve açıklama */}
-        <Box ta="center" style={{ width: '100%' }}>
-          <Title
-            order={2}
-            size="40px"
-            style={{
-              lineHeight: '48px',
-              fontWeight: 500,
-              marginBottom: '20px'
-            }}
-          >
+    <Flex direction="column" justify="center" align="center" style={{ height: '100%', padding: 'var(--mantine-spacing-xl)', position: 'relative', overflow: 'hidden' }}>
+
+      {/* Metin ve Indicator Alanı */}
+      <Stack align="center" gap="xl" style={{ maxWidth: '500px', zIndex: 1 }}>
+        <Box ta="center" style={{ width: '100%', height: '150px' }}> {/* YENİ: Sabit yükseklik */}
+          <Title order={2} fz={40} lh="48px" fw={500} mb="lg">
             {showcaseTexts[currentIndex].title}
           </Title>
-          <Text
-            size="16px"
-            style={{
-              lineHeight: '24px',
-              opacity: 0.7,
-              maxWidth: '500px'
-            }}
-          >
+          <Text size="lg" c="neutral.6" lh="24px">
             {showcaseTexts[currentIndex].subtitle}
           </Text>
         </Box>
 
-        {/* Indicator noktaları */}
-        <Flex gap="8px" justify="center">
+        <Flex gap="sm" justify="center">
           {showcaseTexts.map((_, index) => (
             <Box
               key={index}
               style={{
                 width: index === currentIndex ? '24px' : '6px',
                 height: '6px',
-                borderRadius: index === currentIndex ? '3px' : '50%',
-                backgroundColor: index === currentIndex ? '#16a34a' : '#dadddc',
-                transition: 'all 0.3s ease',
+                borderRadius: '3px',
+                backgroundColor: index === currentIndex ? 'var(--mantine-color-brand-5)' : 'var(--mantine-color-neutral-4)',
+                transition: 'width 0.3s ease',
               }}
             />
           ))}
         </Flex>
-
-        {/* Büyük ürün görseli */}
-        <Box style={{ position: 'relative', width: '100%' }}>
-          <Image
-            src={showcaseImage}
-            radius="16px"
-            style={{
-              width: '100%',
-              maxWidth: '600px',
-              boxShadow: '0 16px 32px -12px rgba(14, 18, 27, 0.1)',
-              border: '4px solid white',
-              borderRadius: '20px',
-            }}
-          />
-        </Box>
       </Stack>
-    </Center>
+
+      {/* YENİ: Konumlandırılmış Büyük Ürün Görseli */}
+      <Image
+        src={showcaseImage}
+        radius="xl"
+        style={{
+          position: 'absolute',
+          bottom: '-5%', // Alt kenardan hafifçe taşsın
+          right: '-10%', // Sağ kenardan daha fazla taşsın
+          width: '90%', // Genişliği ayarla
+          maxWidth: '700px',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+          border: '4px solid white',
+          zIndex: 0, // Metinlerin arkasında kalsın
+        }}
+      />
+    </Flex>
   );
 }
