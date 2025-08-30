@@ -33,7 +33,7 @@ export function AuthShowcasePanel() {
   }, []);
 
   return (
-    // Ana konteyner, içeriği ortalamak ve konumlandırmak için Flex kullanıyor
+    // Ana konteyner. `justify` ve `align` ile içeriği dikey/yatayda ortalayacak.
     <Flex
       direction="column"
       justify="center"
@@ -41,22 +41,25 @@ export function AuthShowcasePanel() {
       style={{
         height: '100%',
         padding: isTablet ? 'var(--mantine-spacing-md)' : 'var(--mantine-spacing-xl)',
-        position: 'relative', // Konumlandırma için
-        overflow: 'hidden', // Taşmaları engellemek için
+        position: 'relative',
+        overflow: 'hidden',
       }}
     >
+      {/* Metin ve İndikatörleri içeren üst kısım - resmin üstünde konumlandırıldı */}
       <Stack
         align="center"
         gap={isTablet ? 'md' : 'xl'}
         style={{
+          position: 'absolute',
+          top: '12%',
+          left: '50%',
+          transform: 'translateX(-50%)',
           maxWidth: isDesktop ? '600px' : '500px',
           width: '100%',
-          position: 'relative',
-          zIndex: 2, // Resmin üzerinde kalması için
+          zIndex: 2,
         }}
       >
-        {/* Ana başlık ve açıklama */}
-        <Box ta="center" style={{ width: '100%' }}>
+        <Box ta="center" style={{ width: '100%', textAlign: 'center' }}>
           <Title
             order={2}
             size={isTablet ? '32px' : '40px'}
@@ -64,6 +67,7 @@ export function AuthShowcasePanel() {
               lineHeight: isTablet ? '40px' : '48px',
               fontWeight: 500,
               marginBottom: isTablet ? '16px' : '20px',
+              textAlign: 'center',
             }}
           >
             {showcaseTexts[currentIndex].title}
@@ -74,13 +78,14 @@ export function AuthShowcasePanel() {
               lineHeight: isTablet ? '20px' : '24px',
               opacity: 0.7,
               maxWidth: isTablet ? '400px' : '500px',
+              textAlign: 'center',
+              margin: '0 auto',
             }}
           >
             {showcaseTexts[currentIndex].subtitle}
           </Text>
         </Box>
 
-        {/* Indicator noktaları */}
         <Flex gap="8px" justify="center">
           {showcaseTexts.map((_, index) => (
             <Box
@@ -97,22 +102,23 @@ export function AuthShowcasePanel() {
         </Flex>
       </Stack>
 
-      {/* YENİ: Genişletilmiş ve konumlandırılmış ürün görseli */}
+      {/* Yeniden konumlandırılmış ürün görseli. Artık metin bloğunun bir parçası değil. */}
       <Image
         src={showcaseImage}
         radius={isTablet ? '12px' : '16px'}
         style={{
           position: 'absolute',
-          bottom: '-10%', // Alt kenardan aşağıya taşıyor
-          right: '-15%',  // Sağ kenardan dışarı taşıyor
-          width: '110%',  // Genişliğini artırarak taşma efekti sağlıyor
-          maxWidth: '800px', // Çok fazla büyümesini engelle
+          // YENİ: Konumlandırma değerleri daha hassas ayarlandı
+          bottom: isTablet ? '-5%' : '-8%',
+          right: isTablet ? '-3%' : '-5%', // Biraz daha sola kaydırıldı
+          width: isTablet ? '100%' : '105%', // Genişliği biraz azalttık
+          maxWidth: '800px',
           boxShadow: isTablet
             ? '0 8px 16px -6px rgba(14, 18, 27, 0.1)'
             : '0 16px 32px -12px rgba(14, 18, 27, 0.1)',
           border: isTablet ? '3px solid white' : '4px solid white',
           borderRadius: isTablet ? '16px' : '20px',
-          zIndex: 1, // Metinlerin arkasında kalması için
+          zIndex: 1,
         }}
       />
     </Flex>
