@@ -2,38 +2,80 @@
 
 /* CSS temizlendi - LoginPage kendi styling'ini kullanacak */
 
-/* Phone Input Styling - Responsive */
+/* Phone Input Styling - Mantine Filled Variant uyumlu */
 .react-international-phone-input-container {
   height: 56px;
   width: 100%;
+  position: relative;
 }
 
 .react-international-phone-input {
   height: 56px !important;
   font-size: 16px !important;
+  font-weight: 500 !important;
   border-radius: 8px !important;
-  border: 1px solid #dee2e6 !important;
-  padding-left: 70px !important;
+  background-color: var(--mantine-color-neutral-2) !important;
+  border: 1px solid transparent !important;
+  padding-left: 80px !important;
   width: 100% !important;
   box-sizing: border-box !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+  font-family: 'Urbanist', sans-serif !important;
 }
 
-.react-international-phone-country-selector-button {
+/* Country selector button - daha genel selector */
+.react-international-phone-input-container button {
   border-radius: 8px 0 0 8px !important;
-  border: 1px solid #dee2e6 !important;
+  background-color: var(--mantine-color-neutral-2) !important;
+  border: 1px solid transparent !important;
   border-right: none !important;
   height: 56px !important;
-  min-width: 60px !important;
+  min-width: 70px !important;
+  transition: background-color 0.15s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 8px !important;
 }
 
-.react-international-phone-input:focus {
-  border-color: #228be6 !important;
+/* Bayrak görseli düzeltmeleri */
+.react-international-phone-input-container button img {
+  width: 20px !important;
+  height: 15px !important;
+  object-fit: cover !important;
+  border-radius: 2px !important;
+}
+
+/* Ülke kodu metni */
+.react-international-phone-input-container button span {
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  margin-left: 4px !important;
+  color: #495955 !important;
+}
+
+/* Dropdown ok */
+.react-international-phone-input-container button svg {
+  margin-left: 4px !important;
+  color: #495955 !important;
+}
+
+/* Odaklanma stilleri */
+.react-international-phone-input:focus,
+.react-international-phone-input:focus-within {
+  border-color: var(--mantine-color-brand-5) !important;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15) !important;
   outline: none !important;
-  box-shadow: 0 0 0 1px #228be6 !important;
 }
 
-.react-international-phone-country-selector-button:hover {
-  background-color: #f8f9fa !important;
+.react-international-phone-input-container button:hover {
+  background-color: var(--mantine-color-neutral-3) !important;
+}
+
+/* Hata durumu */
+.react-international-phone-input[aria-invalid="true"] {
+  border-color: #e03131 !important;
+  box-shadow: 0 0 0 3px rgba(224, 49, 49, 0.15) !important;
 }
 
 /* Mobile responsive adjustments */
@@ -45,12 +87,17 @@
   .react-international-phone-input {
     height: 48px !important;
     font-size: 14px !important;
-    padding-left: 60px !important;
+    padding-left: 70px !important;
   }
   
-  .react-international-phone-country-selector-button {
+  .react-international-phone-input-container button {
     height: 48px !important;
-    min-width: 50px !important;
+    min-width: 60px !important;
+  }
+  
+  .react-international-phone-input-container button img {
+    width: 18px !important;
+    height: 13px !important;
   }
 }
 
@@ -70,12 +117,17 @@
   .react-international-phone-input {
     height: 44px !important;
     font-size: 13px !important;
-    padding-left: 55px !important;
+    padding-left: 65px !important;
   }
   
-  .react-international-phone-country-selector-button {
+  .react-international-phone-input-container button {
     height: 44px !important;
-    min-width: 45px !important;
+    min-width: 55px !important;
+  }
+  
+  .react-international-phone-input-container button img {
+    width: 16px !important;
+    height: 12px !important;
   }
 }
 

@@ -1,6 +1,6 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMediaQuery } from '@mantine/hooks';
+import { useForm } from '@mantine/form';
 import {
   TextInput,
   PasswordInput,
@@ -11,7 +11,6 @@ import {
   Text,
   Title,
   Group,
-  rem,
 } from '@mantine/core';
 // YENİ: Telefon numarası bileşenini import ediyoruz
 import { PhoneInput } from 'react-international-phone';
@@ -23,28 +22,76 @@ export function RegisterForm() {
   const isTablet = useMediaQuery('(max-width: 768px)');
   const isSmallMobile = useMediaQuery('(max-width: 360px)');
   
-  const [businessName, setBusinessName] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  // YENİ: Telefon numarası için state
-  const [phone, setPhone] = useState('');
-  const [password, setPassword] = useState('');
-  const [termsAccepted, setTermsAccepted] = useState(false);
+  const form = useForm({
+    initialValues: {
+      businessName: '',
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      password: '',
+      termsAccepted: false,
+    },
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('Kayıt denemesi:', {
-      businessName,
-      firstName,
-      lastName,
-      email,
-      phone, // Konsola telefon numarasını da yazdır
-      password,
-      termsAccepted,
-    });
-    // TODO: Kayıt olma mantığı buraya eklenecek
-  };
+    validate: {
+      businessName: (value) => (value.trim().length > 0 ? null : 'İşletme adı gerekli'),
+      firstName: (value) => (value.trim().length > 0 ? null : 'Ad gerekli'),
+      lastName: (value) => (value.trim().length > 0 ? null : 'Soyad gerekli'),
+      email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Geçersiz e-posta adresi'),
+      // Telefon numarası doğrulama
+      phone: (value) => {
+        if (!value.trim()) return 'Telefon numarası gerekli';
+        // Basit telefon numarası format kontrolü
+        const phoneRegex = /^\+[1-9]\d{1,14}$/; // E.164 formatı
+        if (!phoneRegex.test(value)) return 'Geçersiz telefon numarası formatı';
+        return null;
+      },
+      password: (value) => (value.length >= 6 ? null : 'Şifre en az 6 karakter olmalı'),
+      termsAccepted: (value) => (value ? null : 'Kullanım koşullarını kabul etmelisiniz'),
+    },
+  });
+
+  const handleSubmit = form.onSubmit(async (values) => {
+    console.log('Kayıt denemesi (form values):', values);
+    
+    try {
+      const response = await fetch('http://localhost:3000/users', { // Backend'deki yeni Users endpoint'i
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: values.email, // E-postayı kullanıcı adı olarak kullanıyoruz
+          firstName: values.firstName,
+          lastName: values.lastName,
+          email: values.email,
+          phone: values.phone,
+          password: values.password,
+          role: 'ADMIN', // Varsayılan rol
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        console.log('Kayıt başarılı:', data);
+        // Başarılı kayıt sonrası giriş sayfasına yönlendir
+        navigate('/');
+      } else {
+        console.error('Kayıt başarısız:', data);
+        // Hata mesajını form'a ekle
+        if (data.message) {
+          form.setErrors({ email: data.message });
+        } else {
+          form.setErrors({ email: 'Kayıt başarısız oldu' });
+        }
+      }
+
+    } catch (error) {
+      console.error('API çağrısı hatası:', error);
+      form.setErrors({ email: 'Sunucuya bağlanılamadı. Lütfen tekrar deneyin.' });
+    }
+  });
 
   return (
     <form onSubmit={handleSubmit}>
@@ -80,8 +127,7 @@ export function RegisterForm() {
           required
           label="İşletme Adı"
           placeholder="İşletmenizin adını girin"
-          value={businessName}
-          onChange={(event) => setBusinessName(event.currentTarget.value)}
+          {...form.getInputProps('businessName')}
           size={isSmallMobile ? "sm" : "md"}
         />
         
@@ -90,16 +136,14 @@ export function RegisterForm() {
             required
             label="Ad"
             placeholder="Adınızı girin"
-            value={firstName}
-            onChange={(event) => setFirstName(event.currentTarget.value)}
+            {...form.getInputProps('firstName')}
             size={isSmallMobile ? "sm" : "md"}
           />
           <TextInput
             required
             label="Soyad"
             placeholder="Soyadınızı girin"
-            value={lastName}
-            onChange={(event) => setLastName(event.currentTarget.value)}
+            {...form.getInputProps('lastName')}
             size={isSmallMobile ? "sm" : "md"}
           />
         </Group>
@@ -109,12 +153,11 @@ export function RegisterForm() {
           label="E-posta Adresi"
           placeholder="E-posta adresinizi girin"
           type="email"
-          value={email}
-          onChange={(event) => setEmail(event.currentTarget.value)}
+          {...form.getInputProps('email')}
           size={isSmallMobile ? "sm" : "md"}
         />
 
-        {/* YENİ: Telefon Numarası Giriş Alanı */}
+        {/* Telefon Numarası Giriş Alanı */}
         <div>
           <Text 
             component="label" 
@@ -126,23 +169,30 @@ export function RegisterForm() {
           </Text>
           <PhoneInput
             defaultCountry="tr"
-            value={phone}
-            onChange={(phone) => setPhone(phone)}
+            value={form.values.phone}
+            onChange={(phone) => form.setFieldValue('phone', phone)}
             placeholder="Telefon numaranızı girin"
-            inputClassName="mantine-phone-input"
+            inputClassName="react-international-phone-input"
+            inputProps={{
+              'aria-invalid': form.errors.phone ? 'true' : 'false',
+            }}
             style={{
               '--react-international-phone-height': isSmallMobile ? '44px' : isMobile ? '48px' : '56px',
               '--react-international-phone-font-size': isSmallMobile ? '14px' : isMobile ? '15px' : '16px',
             } as React.CSSProperties}
           />
+          {form.errors.phone && (
+            <Text size="xs" c="red" mt={4}>
+              {form.errors.phone}
+            </Text>
+          )}
         </div>
 
         <PasswordInput
           required
           label="Şifre"
           placeholder="Güçlü bir şifre belirleyin"
-          value={password}
-          onChange={(event) => setPassword(event.currentTarget.value)}
+          {...form.getInputProps('password')}
           size={isSmallMobile ? "sm" : "md"}
         />
 
@@ -157,8 +207,7 @@ export function RegisterForm() {
               'nı okudum ve kabul ediyorum.
             </Text>
           }
-          checked={termsAccepted}
-          onChange={(event) => setTermsAccepted(event.currentTarget.checked)}
+          {...form.getInputProps('termsAccepted', { type: 'checkbox' })}
           size={isSmallMobile ? "sm" : "md"}
         />
 
