@@ -2,9 +2,10 @@
 
 /* CSS temizlendi - LoginPage kendi styling'ini kullanacak */
 
-/* Phone Input Styling */
+/* Phone Input Styling - Responsive */
 .react-international-phone-input-container {
   height: 56px;
+  width: 100%;
 }
 
 .react-international-phone-input {
@@ -13,6 +14,8 @@
   border-radius: 8px !important;
   border: 1px solid #dee2e6 !important;
   padding-left: 70px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
 
 .react-international-phone-country-selector-button {
@@ -20,13 +23,83 @@
   border: 1px solid #dee2e6 !important;
   border-right: none !important;
   height: 56px !important;
+  min-width: 60px !important;
 }
 
 .react-international-phone-input:focus {
   border-color: #228be6 !important;
   outline: none !important;
+  box-shadow: 0 0 0 1px #228be6 !important;
 }
 
 .react-international-phone-country-selector-button:hover {
   background-color: #f8f9fa !important;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 480px) {
+  .react-international-phone-input-container {
+    height: 48px;
+  }
+  
+  .react-international-phone-input {
+    height: 48px !important;
+    font-size: 14px !important;
+    padding-left: 60px !important;
+  }
+  
+  .react-international-phone-country-selector-button {
+    height: 48px !important;
+    min-width: 50px !important;
+  }
+}
+
+/* Tablet responsive adjustments */
+@media (max-width: 768px) {
+  .react-international-phone-input {
+    font-size: 15px !important;
+  }
+}
+
+/* Extra small mobile adjustments */
+@media (max-width: 360px) {
+  .react-international-phone-input-container {
+    height: 44px;
+  }
+  
+  .react-international-phone-input {
+    height: 44px !important;
+    font-size: 13px !important;
+    padding-left: 55px !important;
+  }
+  
+  .react-international-phone-country-selector-button {
+    height: 44px !important;
+    min-width: 45px !important;
+  }
+}
+
+/* Form responsive improvements */
+@media (max-width: 480px) {
+  .mantine-TextInput-input,
+  .mantine-PasswordInput-input {
+    font-size: 14px !important;
+  }
+  
+  .mantine-TextInput-label,
+  .mantine-PasswordInput-label {
+    font-size: 13px !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .mantine-TextInput-input,
+  .mantine-PasswordInput-input {
+    font-size: 13px !important;
+  }
+  
+  .mantine-TextInput-label,
+  .mantine-PasswordInput-label {
+    font-size: 12px !important;
+  }
 }

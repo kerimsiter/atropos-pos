@@ -21,6 +21,7 @@ export function RegisterForm() {
   const navigate = useNavigate(); // Yönlendirme için hook
   const isMobile = useMediaQuery('(max-width: 480px)');
   const isTablet = useMediaQuery('(max-width: 768px)');
+  const isSmallMobile = useMediaQuery('(max-width: 360px)');
   
   const [businessName, setBusinessName] = useState('');
   const [firstName, setFirstName] = useState('');
@@ -47,16 +48,16 @@ export function RegisterForm() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <Stack gap="lg">
+      <Stack gap={isSmallMobile ? "md" : isMobile ? "lg" : "lg"}>
         {/* Başlık */}
-        <Stack gap="xs" align="center" mb={isTablet ? 'md' : 'lg'}>
+        <Stack gap="xs" align="center" mb={isSmallMobile ? 'sm' : isTablet ? 'md' : 'lg'}>
           <Title 
             order={2} 
-            size={isMobile ? '28px' : '32px'} 
+            size={isSmallMobile ? '24px' : isMobile ? '28px' : '32px'} 
             c="dark.8" 
             ta="center" 
             style={{ 
-              lineHeight: isMobile ? '36px' : '40px', 
+              lineHeight: isSmallMobile ? '32px' : isMobile ? '36px' : '40px', 
               fontWeight: 600 
             }}
           >
@@ -64,11 +65,11 @@ export function RegisterForm() {
           </Title>
           <Text 
             c="neutral.6" 
-            size={isMobile ? '14px' : '16px'} 
+            size={isSmallMobile ? '13px' : isMobile ? '14px' : '16px'} 
             ta="center" 
             style={{ 
-              lineHeight: isMobile ? '20px' : '24px', 
-              maxWidth: isMobile ? '280px' : '320px'
+              lineHeight: isSmallMobile ? '18px' : isMobile ? '20px' : '24px', 
+              maxWidth: isSmallMobile ? '260px' : isMobile ? '280px' : '320px'
             }}
           >
             Yeni bir hesap oluşturarak başlayın.
@@ -81,6 +82,7 @@ export function RegisterForm() {
           placeholder="İşletmenizin adını girin"
           value={businessName}
           onChange={(event) => setBusinessName(event.currentTarget.value)}
+          size={isSmallMobile ? "sm" : "md"}
         />
         
         <Group grow={!isMobile} style={{ flexDirection: isMobile ? 'column' : 'row' }}>
@@ -90,6 +92,7 @@ export function RegisterForm() {
             placeholder="Adınızı girin"
             value={firstName}
             onChange={(event) => setFirstName(event.currentTarget.value)}
+            size={isSmallMobile ? "sm" : "md"}
           />
           <TextInput
             required
@@ -97,6 +100,7 @@ export function RegisterForm() {
             placeholder="Soyadınızı girin"
             value={lastName}
             onChange={(event) => setLastName(event.currentTarget.value)}
+            size={isSmallMobile ? "sm" : "md"}
           />
         </Group>
 
@@ -107,11 +111,17 @@ export function RegisterForm() {
           type="email"
           value={email}
           onChange={(event) => setEmail(event.currentTarget.value)}
+          size={isSmallMobile ? "sm" : "md"}
         />
 
         {/* YENİ: Telefon Numarası Giriş Alanı */}
         <div>
-          <Text component="label" size="sm" fw={500} mb={5}>
+          <Text 
+            component="label" 
+            size={isSmallMobile ? "xs" : "sm"} 
+            fw={500} 
+            mb={5}
+          >
             Telefon Numarası <span style={{ color: 'red' }}>*</span>
           </Text>
           <PhoneInput
@@ -121,8 +131,8 @@ export function RegisterForm() {
             placeholder="Telefon numaranızı girin"
             inputClassName="mantine-phone-input"
             style={{
-              '--react-international-phone-height': '56px',
-              '--react-international-phone-font-size': '16px',
+              '--react-international-phone-height': isSmallMobile ? '44px' : isMobile ? '48px' : '56px',
+              '--react-international-phone-font-size': isSmallMobile ? '14px' : isMobile ? '15px' : '16px',
             } as React.CSSProperties}
           />
         </div>
@@ -133,13 +143,14 @@ export function RegisterForm() {
           placeholder="Güçlü bir şifre belirleyin"
           value={password}
           onChange={(event) => setPassword(event.currentTarget.value)}
+          size={isSmallMobile ? "sm" : "md"}
         />
 
         <Checkbox
           required
-          mt="md"
+          mt={isSmallMobile ? "sm" : "md"}
           label={
-            <Text size="sm">
+            <Text size={isSmallMobile ? "xs" : "sm"}>
               <Anchor href="#" target="_blank">
                 Kullanım Koşulları
               </Anchor>
@@ -148,13 +159,27 @@ export function RegisterForm() {
           }
           checked={termsAccepted}
           onChange={(event) => setTermsAccepted(event.currentTarget.checked)}
+          size={isSmallMobile ? "sm" : "md"}
         />
 
-        <Button fullWidth mt={isTablet ? 'lg' : 'xl'} type="submit" size={isMobile ? 'md' : 'lg'}>
+        <Button 
+          fullWidth 
+          mt={isSmallMobile ? 'md' : isTablet ? 'lg' : 'xl'} 
+          type="submit" 
+          size={isSmallMobile ? 'sm' : isMobile ? 'md' : 'lg'}
+        >
           Kayıt Ol
         </Button>
 
-        <Text ta="center" size="sm" c="neutral.6" style={{ fontSize: isMobile ? '12px' : '14px' }}>
+        <Text 
+          ta="center" 
+          size={isSmallMobile ? "xs" : "sm"} 
+          c="neutral.6" 
+          style={{ 
+            fontSize: isSmallMobile ? '11px' : isMobile ? '12px' : '14px',
+            lineHeight: isSmallMobile ? '16px' : isMobile ? '18px' : '20px'
+          }}
+        >
           Zaten bir hesabınız var mı?{' '}
           <Anchor component="button" c="brand" onClick={() => navigate('/')}>
             Giriş Yap

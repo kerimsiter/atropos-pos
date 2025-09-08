@@ -5,7 +5,8 @@ import { RegisterForm } from '../../components/Auth/RegisterForm';
 import { AuthHeader } from '../../components/Auth/AuthHeader';
 
 export function RegisterPage(): React.JSX.Element {
-  const isMobile = useMediaQuery('(max-width: 768px)');
+  const isMobile = useMediaQuery('(max-width: 480px)');
+  const isTablet = useMediaQuery('(max-width: 768px)');
   
   return (
     <Grid gutter={0} bg="neutral.2">
@@ -20,14 +21,14 @@ export function RegisterPage(): React.JSX.Element {
           direction="column"
           justify="center"
           style={{ 
-            height: isMobile ? 'auto' : '100vh', 
-            minHeight: isMobile ? '100vh' : 'auto',
-            padding: isMobile ? '80px 16px 24px 16px' : '24px' 
+            height: isTablet ? 'auto' : '100vh', 
+            minHeight: isTablet ? '100vh' : 'auto',
+            padding: isMobile ? '70px 12px 20px 12px' : isTablet ? '80px 20px 24px 20px' : '24px' 
           }}
         >
           <Box
             style={{
-              maxWidth: isMobile ? '100%' : '427px',
+              maxWidth: isMobile ? '100%' : isTablet ? '400px' : '427px',
               width: '100%',
               margin: '0 auto',
             }}

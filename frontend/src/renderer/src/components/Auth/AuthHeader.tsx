@@ -1,5 +1,5 @@
 // frontend/src/renderer/src/components/Auth/AuthHeader.tsx
-import { Box, Button, Group, Image, rem } from '@mantine/core';
+import { Box, Button, Group, Image } from '@mantine/core';
 import { IconHelpCircle } from '@tabler/icons-react';
 import { useMediaQuery } from '@mantine/hooks';
 import logo from '../../assets/logo.svg';
@@ -7,6 +7,7 @@ import logo from '../../assets/logo.svg';
 export function AuthHeader() {
   const isMobile = useMediaQuery('(max-width: 480px)');
   const isTablet = useMediaQuery('(max-width: 768px)');
+  const isSmallMobile = useMediaQuery('(max-width: 360px)');
 
   return (
     // Sayfanın üst kısmına sabitlenen ana kutu
@@ -16,7 +17,7 @@ export function AuthHeader() {
         top: 0,
         left: 0,
         right: 0,
-        padding: isTablet ? '16px' : '20px 24px',
+        padding: isSmallMobile ? '12px' : isTablet ? '16px' : '20px 24px',
         zIndex: 10,
       }}
     >
@@ -24,7 +25,7 @@ export function AuthHeader() {
         {/* SVG Logo - responsive boyut */}
         <Image 
           src={logo} 
-          h={isTablet ? 24 : 28}
+          h={isSmallMobile ? 20 : isTablet ? 24 : 28}
           w="auto" 
           fit="contain"
           style={{
@@ -35,15 +36,16 @@ export function AuthHeader() {
         {/* Destek Butonu - responsive */}
         <Button
           variant="subtle"
-          size={isTablet ? 'xs' : 'sm'}
+          size={isSmallMobile ? 'xs' : isTablet ? 'xs' : 'sm'}
           color="gray"
-          leftSection={<IconHelpCircle size={isTablet ? 14 : 16} />}
+          leftSection={<IconHelpCircle size={isSmallMobile ? 12 : isTablet ? 14 : 16} />}
           style={{
             fontWeight: 500,
-            fontSize: isTablet ? '12px' : '14px',
-            height: isTablet ? '32px' : '36px',
-            borderRadius: isTablet ? '6px' : '8px',
+            fontSize: isSmallMobile ? '11px' : isTablet ? '12px' : '14px',
+            height: isSmallMobile ? '28px' : isTablet ? '32px' : '36px',
+            borderRadius: isSmallMobile ? '4px' : isTablet ? '6px' : '8px',
             transition: 'all 0.2s ease',
+            minWidth: isSmallMobile ? '60px' : 'auto',
           }}
           styles={{
             root: {
@@ -54,7 +56,7 @@ export function AuthHeader() {
             },
           }}
         >
-          {isMobile ? 'Destek' : 'Destek İste'}
+          {isSmallMobile ? 'Yardım' : isMobile ? 'Destek' : 'Destek İste'}
         </Button>
       </Group>
     </Box>
